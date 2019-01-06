@@ -14,19 +14,19 @@
 
         private readonly TRight rightValue;
 
-        private readonly State state;
+        private readonly EitherState state;
 
         private Either(TLeft leftValue)
-            : this(State.Left, leftValue)
+            : this(EitherState.Left, leftValue)
         {
         }
 
         private Either(TRight rightValue)
-            : this(State.Right, rightValue: rightValue)
+            : this(EitherState.Right, rightValue: rightValue)
         {
         }
 
-        private Either(State state, TLeft leftValue = default, TRight rightValue = default)
+        private Either(EitherState state, TLeft leftValue = default, TRight rightValue = default)
         {
             this.state = state;
             this.leftValue = leftValue;
@@ -35,20 +35,20 @@
 
         private Either(SerializationInfo serializationInfo, StreamingContext context)
         {
-            switch ((State)serializationInfo.GetValue(nameof(state), typeof(State)))
+            switch ((EitherState)serializationInfo.GetValue(nameof(state), typeof(EitherState)))
             {
-                case State.Neither:
-                    state = State.Neither;
+                case EitherState.Neither:
+                    state = EitherState.Neither;
                     leftValue = default;
                     rightValue = default;
                     break;
-                case State.Left:
-                    state = State.Left;
+                case EitherState.Left:
+                    state = EitherState.Left;
                     leftValue = (TLeft)serializationInfo.GetValue(nameof(leftValue), typeof(TLeft));
                     rightValue = default;
                     break;
-                case State.Right:
-                    state = State.Right;
+                case EitherState.Right:
+                    state = EitherState.Right;
                     leftValue = default;
                     rightValue = (TRight)serializationInfo.GetValue(nameof(rightValue), typeof(TRight));
                     break;
@@ -57,16 +57,16 @@
             }
         }
 
-        private enum State
+        private enum EitherState
         {
             Neither,
             Left,
             Right,
         }
 
-        public bool IsLeft => state == State.Left;
+        public bool IsLeft => state == EitherState.Left;
 
-        public bool IsRight => state == State.Right;
+        public bool IsRight => state == EitherState.Right;
 
         public static implicit operator Either<TLeft, TRight>(TLeft leftValue)
             => new Either<TLeft, TRight>(leftValue);
@@ -192,14 +192,14 @@
         {
             switch (state)
             {
-                case State.Neither:
+                case EitherState.Neither:
                     return state == other.state
                            && EqualityComparer<TLeft>.Default.Equals(leftValue, other.leftValue)
                            && EqualityComparer<TRight>.Default.Equals(rightValue, other.rightValue);
-                case State.Left:
+                case EitherState.Left:
                     return state == other.state
                            && EqualityComparer<TLeft>.Default.Equals(leftValue, other.leftValue);
-                case State.Right:
+                case EitherState.Right:
                     return state == other.state
                            && EqualityComparer<TRight>.Default.Equals(rightValue, other.rightValue);
                 default:
@@ -226,11 +226,11 @@
             {
                 switch (state)
                 {
-                    case State.Neither:
+                    case EitherState.Neither:
                         return 0;
-                    case State.Left:
+                    case EitherState.Left:
                         return (EqualityComparer<TLeft>.Default.GetHashCode(leftValue) * 397) ^ (int)state;
-                    case State.Right:
+                    case EitherState.Right:
                         return (EqualityComparer<TRight>.Default.GetHashCode(rightValue) * 397) ^ (int)state;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -244,11 +244,11 @@
 
             switch (state)
             {
-                case State.Neither:
+                case EitherState.Neither:
                     return $"Neither{types}";
-                case State.Left:
+                case EitherState.Left:
                     return $"Left{types}: {leftValue}";
-                case State.Right:
+                case EitherState.Right:
                     return $"Right{types}: {rightValue}";
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -261,12 +261,12 @@
 
             switch (state)
             {
-                case State.Neither:
+                case EitherState.Neither:
                     break;
-                case State.Left:
+                case EitherState.Left:
                     info.AddValue(nameof(leftValue), leftValue);
                     break;
-                case State.Right:
+                case EitherState.Right:
                     info.AddValue(nameof(rightValue), rightValue);
                     break;
                 default:
