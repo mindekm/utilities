@@ -156,28 +156,28 @@
 
         [Pure]
         [DebuggerStepThrough]
-        public TLeft GetLeftOrDefault() => IsLeft ? leftValue : default;
+        public TLeft GetLeftOrDefault() => GetLeftOr(default(TLeft));
 
         [Pure]
         [DebuggerStepThrough]
-        public TRight GetRightOrDefault() => IsRight ? rightValue : default;
+        public TRight GetRightOrDefault() => GetRightOr(default(TRight));
 
         [Pure]
         [DebuggerStepThrough]
-        public TLeft GetLeftOr(TLeft alternative) => IsLeft ? leftValue : alternative;
+        public TLeft GetLeftOr(TLeft alternative) => GetLeftOr(() => alternative);
 
         [Pure]
         [DebuggerStepThrough]
-        public TLeft GetLeftOr(Func<TLeft> alternativeFactor)
+        public TLeft GetLeftOr(Func<TLeft> alternativeFactory)
         {
-            Guard.NotNull(alternativeFactor, nameof(alternativeFactor));
+            Guard.NotNull(alternativeFactory, nameof(alternativeFactory));
 
-            return IsLeft ? leftValue : alternativeFactor();
+            return IsLeft ? leftValue : alternativeFactory();
         }
 
         [Pure]
         [DebuggerStepThrough]
-        public TRight GetRightOr(TRight alternative) => IsRight ? rightValue : alternative;
+        public TRight GetRightOr(TRight alternative) => GetRightOr(() => alternative);
 
         [Pure]
         [DebuggerStepThrough]
@@ -211,8 +211,6 @@
         {
             switch (obj)
             {
-                case null:
-                    return false;
                 case Either<TLeft, TRight> other:
                     return Equals(other);
                 default:
