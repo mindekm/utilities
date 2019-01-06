@@ -5,13 +5,12 @@
     <Version>0.1.0-alpha2</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Utilities</RootNamespace>
-    <LangVersion>latest</LangVersion>    
-	<CodeAnalysisRuleSet></CodeAnalysisRuleSet>	
-	<Product>Utilities</Product>	
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>latest</LangVersion>	
+    <Product>Utilities</Product>	
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <CodeAnalysisRuleSet>Stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <PackageId>Utilities</PackageId>
     <Title></Title>
@@ -20,7 +19,7 @@
     <Copyright>2018 Milan Mindek</Copyright>      
     <PackageProjectUrl></PackageProjectUrl>
     <RepositoryUrl></RepositoryUrl>
-	<RepositoryType>Git</RepositoryType>    
+    <RepositoryType>Git</RepositoryType>    
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageLicenceFile>../../LICENCE.md</PackageLicenceFile>
   </PropertyGroup>
