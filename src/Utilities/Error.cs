@@ -20,5 +20,8 @@
 
         public static InvalidCastException InvalidCast(string source, Type target)
             => InvalidCast(source, target.Name);
+
+        public static InvalidOperationException EitherRetrievalFailure(string leftOrRight, string eitherState)
+            => new InvalidOperationException($"Cannot retrieve {leftOrRight} value from {eitherState}.");
     }
 }

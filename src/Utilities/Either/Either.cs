@@ -111,7 +111,7 @@
                 return leftValue;
             }
 
-            throw new InvalidOperationException($"Cannot retrieve Left value from {ToString()}");
+            throw Error.EitherRetrievalFailure("left", ToString());
         }
 
         [Pure]
@@ -123,7 +123,7 @@
                 return rightValue;
             }
 
-            throw new InvalidOperationException($"Cannot retrieve Right value from {ToString()}");
+            throw Error.EitherRetrievalFailure("right", ToString());
         }
 
         [Pure]
