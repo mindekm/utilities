@@ -4,72 +4,31 @@
 
     public static class EnsurePredicateExtensions
     {
-        public static void Passes<T>(this in That<T> that, Func<T, bool> predicate)
-        {
-            that.Passes(predicate, new EnsureException());
-        }
+        public static void IsTrueFor<T>(this in That<T> that, Func<T, bool> predicate)
+            => that.IsTrueFor(predicate, new EnsureException());
 
-        public static void Passes<T, TException>(this in That<T> that, Func<T, bool> predicate, TException exception)
-            where TException : Exception
+        public static void IsTrueFor<T>(this in That<T> that, Func<T, bool> predicate, Exception exception)
         {
-            that.Passes(predicate, () => exception);
-        }
+            Guard.NotNull(predicate, nameof(predicate));
+            Guard.NotNull(exception, nameof(exception));
 
-        public static void Passes<T, TException>(
-            this in That<T> that,
-            Func<T, bool> predicate,
-            Func<TException> exceptionFactory)
-            where TException : Exception
-        {
-            that.Passes(predicate, _ => exceptionFactory());
-        }
-
-        public static void Passes<T, TException>(
-            this in That<T> that,
-            Func<T, bool> predicate,
-            Func<T, TException> exceptionFactory)
-            where TException : Exception
-        {
             if (!predicate(that.Item))
             {
-                throw exceptionFactory(that.Item);
+                throw exception;
             }
         }
 
-        public static void Fails<T>(
-            this in That<T> that,
-            Func<T, bool> predicate)
-        {
-            that.Fails(predicate, new EnsureException());
-        }
+        public static void IsFalseFor<T>(this in That<T> that, Func<T, bool> predicate)
+            => that.IsFalseFor(predicate, Error.EnsureFailure());
 
-        public static void Fails<T, TException>(
-            this in That<T> that,
-            Func<T, bool> predicate,
-            TException exception)
-            where TException : Exception
+        public static void IsFalseFor<T>(this in That<T> that, Func<T, bool> predicate, Exception exception)
         {
-            that.Fails(predicate, () => exception);
-        }
+            Guard.NotNull(predicate, nameof(predicate));
+            Guard.NotNull(exception, nameof(exception));
 
-        public static void Fails<T, TException>(
-            this in That<T> that,
-            Func<T, bool> predicate,
-            Func<TException> exceptionFactory)
-            where TException : Exception
-        {
-            that.Fails(predicate, _ => exceptionFactory());
-        }
-
-        public static void Fails<T, TException>(
-            this in That<T> that,
-            Func<T, bool> predicate,
-            Func<T, TException> exceptionFactory)
-            where TException : Exception
-        {
             if (predicate(that.Item))
             {
-                throw exceptionFactory(that.Item);
+                throw exception;
             }
         }
     }

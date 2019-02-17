@@ -4,58 +4,72 @@
 
     public static class EnsureNullExtensions
     {
+        public static void IsNull<T>(this in That<T> that)
+            where T : class
+        {
+            that.IsNull(Error.EnsureFailure());
+        }
+
+        public static void IsNull<T>(this in That<T> that, Exception exception)
+            where T : class
+        {
+            Guard.NotNull(exception, nameof(exception));
+
+            if (!(that.Item is null))
+            {
+                throw exception;
+            }
+        }
+
         public static void IsNotNull<T>(this in That<T> that)
             where T : class
         {
-            that.IsNotNull(new EnsureException());
+            that.IsNotNull(Error.EnsureFailure());
         }
 
-        public static void IsNotNull<T, TException>(this in That<T> that, TException exception)
+        public static void IsNotNull<T>(this in That<T> that, Exception exception)
             where T : class
-            where TException : Exception
         {
-            that.IsNotNull(() => exception);
+            Guard.NotNull(exception, nameof(exception));
+
+            if (that.Item is null)
+            {
+                throw exception;
+            }
         }
 
-        public static void IsNotNull<T, TException>(this in That<T> that, Func<TException> exceptionFactory)
-            where T : class
-            where TException : Exception
+        public static void IsNull<T>(this in That<T?> that)
+            where T : struct
         {
-            that.IsNotNull(_ => exceptionFactory());
+            that.IsNull(Error.EnsureFailure());
         }
 
-        public static void IsNotNull<T, TException>(this in That<T> that, Func<T, TException> exceptionFactory)
-            where T : class
-            where TException : Exception
+        public static void IsNull<T>(this in That<T?> that, Exception exception)
+            where T : struct
         {
-            that.Fails(item => item is null, exceptionFactory);
+            Guard.NotNull(exception, nameof(exception));
+
+            if (that.Item.HasValue)
+            {
+                throw exception;
+            }
         }
 
         public static void IsNotNull<T>(this in That<T?> that)
             where T : struct
         {
-            that.IsNotNull(new EnsureException());
+            that.IsNotNull(Error.EnsureFailure());
         }
 
-        public static void IsNotNull<T, TException>(this in That<T?> that, TException exception)
+        public static void IsNotNull<T>(this in That<T?> that, Exception exception)
             where T : struct
-            where TException : Exception
         {
-            that.IsNotNull(() => exception);
-        }
+            Guard.NotNull(exception, nameof(exception));
 
-        public static void IsNotNull<T, TException>(this in That<T?> that, Func<TException> exceptionFactory)
-            where T : struct
-            where TException : Exception
-        {
-            that.IsNotNull(_ => exceptionFactory());
-        }
-
-        public static void IsNotNull<T, TException>(this in That<T?> that, Func<T?, TException> exceptionFactory)
-            where T : struct
-            where TException : Exception
-        {
-            that.Passes(nullable => nullable.HasValue, exceptionFactory);
+            if (!that.Item.HasValue)
+            {
+                throw exception;
+            }
         }
     }
 }
