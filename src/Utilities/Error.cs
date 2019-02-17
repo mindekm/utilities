@@ -24,5 +24,8 @@
 
         public static EnsureException EnsureFailure()
             => new EnsureException("Ensure condition failed.");
+
+        public static InvalidOperationException EitherRetrievalFailure(string leftOrRight, string eitherState)
+            => new InvalidOperationException($"Cannot retrieve {leftOrRight} value from {eitherState}.");
     }
 }

@@ -23,7 +23,10 @@
         public static void NotNull<T>([NoEnumeration] T item, [InvokerParameterName] [NotNull] string parameterName)
             where T : class
         {
-            Ensure.That(item).IsNotNull(Error.NullArgument(parameterName));
+            if (item is null)
+            {
+                throw Error.NullArgument(parameterName);
+            }
         }
 
         /// <summary>
@@ -37,7 +40,10 @@
         public static void NotNull<T>([NoEnumeration] T? item, [InvokerParameterName] [NotNull] string parameterName)
             where T : struct
         {
-            Ensure.That(item).IsNotNull(Error.NullArgument(parameterName));
+            if (!item.HasValue)
+            {
+                throw Error.NullArgument(parameterName);
+            }
         }
 
         /// <summary>

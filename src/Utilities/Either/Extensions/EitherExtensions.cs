@@ -7,9 +7,18 @@
     {
         public static TOut Match<TLeft, TRight, TOut>(this in Either<TLeft, TRight> either, TOut left, TOut right)
         {
-            either.ThrowIfNeither();
+            return either.Match(() => left, () => right);
+        }
 
-            return either.IsLeft ? left : right;
+        public static TOut Match<TLeft, TRight, TOut>(
+            this in Either<TLeft, TRight> either,
+            Func<TOut> left,
+            Func<TOut> right)
+        {
+            Guard.NotNull(left, nameof(left));
+            Guard.NotNull(right, nameof(right));
+
+            return either.Match(_ => left(), _ => right());
         }
 
         public static TOut Match<TLeft, TRight, TOut>(
@@ -19,7 +28,6 @@
         {
             Guard.NotNull(left, nameof(left));
             Guard.NotNull(right, nameof(right));
-            either.ThrowIfNeither();
 
             return either.IsLeft ? left(either.GetLeft()) : right(either.GetRight());
         }
@@ -28,16 +36,8 @@
         {
             Guard.NotNull(left, nameof(left));
             Guard.NotNull(right, nameof(right));
-            either.ThrowIfNeither();
 
-            if (either.IsLeft)
-            {
-                left();
-            }
-            else
-            {
-                right();
-            }
+            either.Match(_ => left(), _ => right());
         }
 
         public static void Match<TLeft, TRight>(
@@ -47,7 +47,6 @@
         {
             Guard.NotNull(left, nameof(left));
             Guard.NotNull(right, nameof(right));
-            either.ThrowIfNeither();
 
             if (either.IsLeft)
             {
@@ -64,24 +63,14 @@
             Func<TInLeft, Either<TOutLeft, TOutRight>> leftBinder,
             Func<TInRight, Either<TOutLeft, TOutRight>> rightBinder)
         {
-            either.ThrowIfNeither();
             Guard.NotNull(leftBinder, nameof(leftBinder));
             Guard.NotNull(rightBinder, nameof(rightBinder));
 
             return Match(either, leftBinder, rightBinder);
         }
 
-        public static Either<TLeft, TRight> Flatten<TLeft, TRight>(this in Either<Either<TLeft, TRight>, TRight> either)
-        {
-            either.ThrowIfNeither();
-
-            return Match(either, left => left, Either<TLeft, TRight>.Right);
-        }
-
         public static IEnumerable<TLeft> AsLeftEnumerable<TLeft, TRight>(this Either<TLeft, TRight> either)
         {
-            either.ThrowIfNeither();
-
             if (either.IsLeft)
             {
                 yield return either.GetLeft();
@@ -90,8 +79,6 @@
 
         public static IEnumerable<TRight> AsRightEnumerable<TLeft, TRight>(this Either<TLeft, TRight> either)
         {
-            either.ThrowIfNeither();
-
             if (either.IsRight)
             {
                 yield return either.GetRight();
@@ -121,14 +108,6 @@
                 {
                     yield return right;
                 }
-            }
-        }
-
-        internal static void ThrowIfNeither<TLeft, TRight>(this in Either<TLeft, TRight> either)
-        {
-            if (!either.IsLeft && !either.IsRight)
-            {
-                throw new InvalidOperationException();
             }
         }
     }
