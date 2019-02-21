@@ -4,7 +4,7 @@
 
     public static class EnsureBoolExtensions
     {
-        public static void IsTrue(this in That<bool> that) => that.IsTrue(new EnsureException());
+        public static void IsTrue(this in That<bool> that) => that.IsTrue(Error.EnsureFailure());
 
         public static void IsTrue(this in That<bool> that, Exception exception)
         {
@@ -16,7 +16,7 @@
             }
         }
 
-        public static void IsFalse(this in That<bool> that) => that.IsFalse(new EnsureException());
+        public static void IsFalse(this in That<bool> that) => that.IsFalse(Error.EnsureFailure());
 
         public static void IsFalse(this in That<bool> that, Exception exception)
         {
