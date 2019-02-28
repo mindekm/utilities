@@ -147,6 +147,16 @@
                 : await failureBinder(result.GetFailure()).ConfigureAwait(false);
         }
 
+        public static Task<Result<TOutValue, TFailure>> BindOnSuccessAsync<TInValue, TOutValue, TFailure>(
+            this Result<TInValue, TFailure> result,
+            Func<TInValue, Task<Result<TOutValue, TFailure>>> successBinder)
+        {
+            return BindAsync(
+                result,
+                successBinder,
+                failure => Task.FromResult(Result<TOutValue, TFailure>.Failure(failure)));
+        }
+
         public static async Task<Result<TOut>> BindAsync<TIn, TOut>(
             this Task<Result<TIn>> result,
             Func<TIn, Result<TOut>> binder)
@@ -167,6 +177,13 @@
             Guard.NotNull(failureBinder, nameof(failureBinder));
 
             return (await result.ConfigureAwait(false)).Bind(successBinder, failureBinder);
+        }
+
+        public static Task<Result<TOutValue, TFailure>> BinOnSuccessAsync<TInValue, TOutValue, TFailure>(
+            this Task<Result<TInValue, TFailure>> result,
+            Func<TInValue, Result<TOutValue, TFailure>> successBinder)
+        {
+            return BindAsync(result, successBinder, Result<TOutValue, TFailure>.Failure);
         }
 
         public static async Task<Result<TOut>> BindAsync<TIn, TOut>(
@@ -191,6 +208,16 @@
             return await (await result.ConfigureAwait(false))
                 .BindAsync(successBinder, failureBinder)
                 .ConfigureAwait(false);
+        }
+
+        public static Task<Result<TOutValue, TFailure>> BindOnSuccessAsync<TInValue, TOutValue, TFailure>(
+            this Task<Result<TInValue, TFailure>> result,
+            Func<TInValue, Task<Result<TOutValue, TFailure>>> successBinder)
+        {
+            return BindAsync(
+                result,
+                successBinder,
+                failure => Task.FromResult(Result<TOutValue, TFailure>.Failure(failure)));
         }
 
         public static Task<Result<TFailure>> FlattenAsync<TFailure>(this Result<Result<TFailure>> result)

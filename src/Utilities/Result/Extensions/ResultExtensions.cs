@@ -130,6 +130,13 @@
             return Match(result, successBinder, failureBinder);
         }
 
+        public static Result<TOutValue, TFailure> BindOnSuccess<TInValue, TOutValue, TFailure>(
+            this Result<TInValue, TFailure> result,
+            Func<TInValue, Result<TOutValue, TFailure>> successBinder)
+        {
+            return Bind(result, successBinder, Result<TOutValue, TFailure>.Failure);
+        }
+
         public static Result<TFailure> Flatten<TFailure>(this Result<Result<TFailure>> result)
         {
             Guard.NotNull(result, nameof(result));
