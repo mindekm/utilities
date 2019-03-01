@@ -179,7 +179,7 @@
             return (await result.ConfigureAwait(false)).Bind(successBinder, failureBinder);
         }
 
-        public static Task<Result<TOutValue, TFailure>> BinOnSuccessAsync<TInValue, TOutValue, TFailure>(
+        public static Task<Result<TOutValue, TFailure>> BindOnSuccessAsync<TInValue, TOutValue, TFailure>(
             this Task<Result<TInValue, TFailure>> result,
             Func<TInValue, Result<TOutValue, TFailure>> successBinder)
         {
