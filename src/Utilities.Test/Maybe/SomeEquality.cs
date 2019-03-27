@@ -39,13 +39,6 @@
         }
 
         [Test]
-        public void Some_ShouldBeEqualToUnderlyingValue()
-        {
-            some.Equals(some.GetValue()).ShouldBeTrue();
-            some.Equals((object)some.GetValue()).ShouldBeTrue();
-        }
-
-        [Test]
         public void Some_ShouldNotBeEqualToNone()
         {
             some.Equals(Maybe.None<string>()).ShouldBeFalse();

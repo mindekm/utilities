@@ -10,7 +10,7 @@
     using Extensions;
 
     [Serializable]
-    public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IEquatable<T>, ISerializable
+    public readonly struct Maybe<T> : IEquatable<Maybe<T>>, ISerializable
     {
         private readonly T value;
 
@@ -46,14 +46,6 @@
         public static bool operator ==(in Maybe<T> left, in Maybe<T> right) => left.Equals(right);
 
         public static bool operator !=(in Maybe<T> left, in Maybe<T> right) => !left.Equals(right);
-
-        public static bool operator ==(in Maybe<T> left, T right) => left.Equals(right);
-
-        public static bool operator !=(in Maybe<T> left, T right) => !left.Equals(right);
-
-        public static bool operator ==(T left, in Maybe<T> right) => right.Equals(left);
-
-        public static bool operator !=(T left, in Maybe<T> right) => !right.Equals(left);
 
         public static Maybe<T> Some(T value) => new Maybe<T>(value);
 
@@ -105,8 +97,6 @@
         public bool Equals(Maybe<T> other)
             => IsSome == other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
 
-        public bool Equals(T other) => EqualityComparer<T>.Default.Equals(value, other);
-
         public override bool Equals(object obj)
         {
             switch (obj)
@@ -114,8 +104,6 @@
                 case null:
                     return IsNone;
                 case Maybe<T> other:
-                    return Equals(other);
-                case T other:
                     return Equals(other);
                 default:
                     return false;
