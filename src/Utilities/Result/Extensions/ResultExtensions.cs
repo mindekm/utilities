@@ -110,12 +110,32 @@
             }
         }
 
-        public static Result<TOut> Bind<TIn, TOut>(this Result<TIn> result, Func<TIn, Result<TOut>> binder)
+        public static Result<TOut> Bind<TIn, TOut>(
+            this Result<TIn> result,
+            Func<Result<TOut>> successBinder,
+            Func<TIn, Result<TOut>> failureBinder)
         {
             Guard.NotNull(result, nameof(result));
-            Guard.NotNull(binder, nameof(binder));
+            Guard.NotNull(successBinder, nameof(successBinder));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
 
-            return Match(result, Result<TOut>.Success, binder);
+            return result.IsSuccess ? successBinder() : failureBinder(result.GetFailure());
+        }
+
+        public static Result<T> BindOnSuccess<T>(this Result<T> result, Func<Result<T>> successBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+
+            return result.IsSuccess ? successBinder() : result;
+        }
+
+        public static Result<T> BindOnFailure<T>(this Result<T> result, Func<T, Result<T>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return result.IsFailure ? failureBinder(result.GetFailure()) : result;
         }
 
         public static Result<TOutValue, TOutFailure> Bind<TInValue, TInFailure, TOutValue, TOutFailure>(
@@ -127,14 +147,198 @@
             Guard.NotNull(successBinder, nameof(successBinder));
             Guard.NotNull(failureBinder, nameof(failureBinder));
 
-            return Match(result, successBinder, failureBinder);
+            return result.IsSuccess ? successBinder(result.GetValue()) : failureBinder(result.GetFailure());
         }
 
         public static Result<TOutValue, TFailure> BindOnSuccess<TInValue, TOutValue, TFailure>(
             this Result<TInValue, TFailure> result,
             Func<TInValue, Result<TOutValue, TFailure>> successBinder)
         {
-            return Bind(result, successBinder, Result<TOutValue, TFailure>.Failure);
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+
+            return result.IsSuccess ? successBinder(result.GetValue()) : Result<TOutValue, TFailure>.Failure(result.GetFailure());
+        }
+
+        public static Result<TValue, TOutFailure> BindOnFailure<TValue, TInFailure, TOutFailure>(
+            this Result<TValue, TInFailure> result,
+            Func<TInFailure, Result<TValue, TOutFailure>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return result.IsFailure ? failureBinder(result.GetFailure()) : Result<TValue, TOutFailure>.Success(result.GetValue());
+        }
+
+        public static Result<TOutFailure> Bind<TValue, TInFailure, TOutFailure>(
+            this Result<TValue, TInFailure> result,
+            Func<TValue, Result<TOutFailure>> successBinder,
+            Func<TInFailure, Result<TOutFailure>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return result.IsSuccess ? successBinder(result.GetValue()) : failureBinder(result.GetFailure());
+        }
+
+        public static Result<TFailure> BindOnSuccess<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Func<Result<TFailure>> successBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+
+            return result.IsSuccess ? successBinder() : Result<TFailure>.Failure(result.GetFailure());
+        }
+
+        public static Result<TOutFailure> BindOnFailure<TValue, TInFailure, TOutFailure>(
+            this Result<TValue, TInFailure> result,
+            Func<TInFailure, Result<TOutFailure>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return result.IsFailure ? failureBinder(result.GetFailure()) : Result<TOutFailure>.Success();
+        }
+
+        public static Result<T> DoOnSuccess<T>(this Result<T> result, Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsSuccess)
+            {
+                action();
+            }
+
+            return result;
+        }
+
+        public static Result<T> DoOnFailure<T>(this Result<T> result, Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsFailure)
+            {
+                action();
+            }
+
+            return result;
+        }
+
+        public static Result<T> DoOnFailure<T>(this Result<T> result, Action<T> action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsFailure)
+            {
+                action(result.GetFailure());
+            }
+
+            return result;
+        }
+
+        public static Result<T> DoOnBoth<T>(this Result<T> result, Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            action();
+            return result;
+        }
+
+        public static Result<T> DoOnBoth<T>(this Result<T> result, Action<Result<T>> action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            action(result);
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnSuccess<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsSuccess)
+            {
+                action();
+            }
+
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnSuccess<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action<TValue> action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsSuccess)
+            {
+                action(result.GetValue());
+            }
+
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnFailure<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsFailure)
+            {
+                action();
+            }
+
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnFailure<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action<TFailure> action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            if (result.IsFailure)
+            {
+                action(result.GetFailure());
+            }
+
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnBoth<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            action();
+            return result;
+        }
+
+        public static Result<TValue, TFailure> DoOnBoth<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Action<Result<TValue, TFailure>> action)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(action, nameof(action));
+
+            action(result);
+            return result;
         }
 
         public static Result<TFailure> Flatten<TFailure>(this Result<Result<TFailure>> result)

@@ -122,5 +122,9 @@
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void Deconstruct(out bool isFailure, out TFailure failure)
             => (isFailure, failure) = (IsFailure, failureReason);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void Deconstruct(out bool isSuccess, out bool isFailure, out TFailure failure)
+            => (isSuccess, isFailure, failure) = (IsSuccess, IsFailure, failureReason);
     }
 }
