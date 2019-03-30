@@ -321,6 +321,109 @@
             return await (await result.ConfigureAwait(false)).BindOnFailureAsync(binder).ConfigureAwait(false);
         }
 
+        public static async Task<Result<TOutFailure>> BindAsync<TValue, TInFailure, TOutFailure>(
+            this Result<TValue, TInFailure> result,
+            Func<TValue, Task<Result<TOutFailure>>> successBinder,
+            Func<TInFailure, Task<Result<TOutFailure>>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return result.IsSuccess
+                ? await successBinder(result.GetValue()).ConfigureAwait(false)
+                : await failureBinder(result.GetFailure()).ConfigureAwait(false);
+        }
+
+        public static async Task<Result<TFailure>> BindOnSuccessAsync<TValue, TFailure>(
+            this Result<TValue, TFailure> result,
+            Func<TValue, Task<Result<TFailure>>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return result.IsSuccess
+                ? await binder(result.GetValue()).ConfigureAwait(false)
+                : Result<TFailure>.Failure(result.GetFailure());
+        }
+
+        public static async Task<Result<TOutFailure>> BindOnFailureAsync<TValue, TInFailure, TOutFailure>(
+            this Result<TValue, TInFailure> result,
+            Func<TInFailure, Task<Result<TOutFailure>>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return result.IsFailure
+                ? await binder(result.GetFailure()).ConfigureAwait(false)
+                : Result<TOutFailure>.Success();
+        }
+
+        public static async Task<Result<TOutFailure>> BindAsync<TValue, TInFailure, TOutFailure>(
+            this Task<Result<TValue, TInFailure>> result,
+            Func<TValue, Result<TOutFailure>> successBinder,
+            Func<TInFailure, Result<TOutFailure>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return (await result.ConfigureAwait(false)).Bind(successBinder, failureBinder);
+        }
+
+        public static async Task<Result<TFailure>> BindOnSuccessAsync<TValue, TFailure>(
+            this Task<Result<TValue, TFailure>> result,
+            Func<TValue, Result<TFailure>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return (await result.ConfigureAwait(false)).BindOnSuccess(binder);
+        }
+
+        public static async Task<Result<TOutFailure>> BindOnFailureAsync<TValue, TInFailure, TOutFailure>(
+            this Task<Result<TValue, TInFailure>> result,
+            Func<TInFailure, Result<TOutFailure>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return (await result.ConfigureAwait(false)).BindOnFailure(binder);
+        }
+
+        public static async Task<Result<TOutFailure>> BindAsync<TValue, TInFailure, TOutFailure>(
+            this Task<Result<TValue, TInFailure>> result,
+            Func<TValue, Task<Result<TOutFailure>>> successBinder,
+            Func<TInFailure, Task<Result<TOutFailure>>> failureBinder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(successBinder, nameof(successBinder));
+            Guard.NotNull(failureBinder, nameof(failureBinder));
+
+            return await (await result.ConfigureAwait(false)).BindAsync(successBinder, failureBinder)
+                .ConfigureAwait(false);
+        }
+
+        public static async Task<Result<TFailure>> BindOnSuccessAsync<TValue, TFailure>(
+            this Task<Result<TValue, TFailure>> result,
+            Func<TValue, Task<Result<TFailure>>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return await (await result.ConfigureAwait(false)).BindOnSuccessAsync(binder).ConfigureAwait(false);
+        }
+
+        public static async Task<Result<TOutFailure>> BindOnFailureAsync<TValue, TInFailure, TOutFailure>(
+            this Task<Result<TValue, TInFailure>> result,
+            Func<TInFailure, Task<Result<TOutFailure>>> binder)
+        {
+            Guard.NotNull(result, nameof(result));
+            Guard.NotNull(binder, nameof(binder));
+
+            return await (await result.ConfigureAwait(false)).BindOnFailureAsync(binder).ConfigureAwait(false);
+        }
+
         public static async Task<Result<T>> DoOnSuccessAsync<T>(this Task<Result<T>> result, Action action)
         {
             Guard.NotNull(result, nameof(result));

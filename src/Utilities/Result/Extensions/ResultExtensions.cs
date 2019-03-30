@@ -184,12 +184,12 @@
 
         public static Result<TFailure> BindOnSuccess<TValue, TFailure>(
             this Result<TValue, TFailure> result,
-            Func<Result<TFailure>> successBinder)
+            Func<TValue, Result<TFailure>> successBinder)
         {
             Guard.NotNull(result, nameof(result));
             Guard.NotNull(successBinder, nameof(successBinder));
 
-            return result.IsSuccess ? successBinder() : Result<TFailure>.Failure(result.GetFailure());
+            return result.IsSuccess ? successBinder(result.GetValue()) : Result<TFailure>.Failure(result.GetFailure());
         }
 
         public static Result<TOutFailure> BindOnFailure<TValue, TInFailure, TOutFailure>(
