@@ -12,16 +12,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Utilities</PackageId>
+    <PackageId>MM.Utilities</PackageId>
     <Title></Title>
     <Description>Various utility classes.</Description>
     <Authors>Milan Mindek</Authors>
-    <Copyright>2018 Milan Mindek</Copyright>      
-    <PackageProjectUrl></PackageProjectUrl>
-    <RepositoryUrl></RepositoryUrl>
+    <Copyright>2019 Milan Mindek</Copyright>      
+    <PackageProjectUrl>https://github.com/mindekm/utilities</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mindekm/utilities</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>    
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageLicenceFile>../../LICENCE.md</PackageLicenceFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
