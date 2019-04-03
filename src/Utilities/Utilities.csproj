@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyName>Utilities</AssemblyName>  
-    <Version>0.1.0-alpha2</Version>
+    <Version>0.1.0-alpha1</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Utilities</RootNamespace>
     <LangVersion>latest</LangVersion>	
