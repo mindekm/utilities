@@ -7,7 +7,7 @@
     {
         public static TOut Match<TLeft, TRight, TOut>(this in Either<TLeft, TRight> either, TOut left, TOut right)
         {
-            return either.Match(() => left, () => right);
+            return either.IsLeft ? left : right;
         }
 
         public static TOut Match<TLeft, TRight, TOut>(
@@ -18,7 +18,7 @@
             Guard.NotNull(left, nameof(left));
             Guard.NotNull(right, nameof(right));
 
-            return either.Match(_ => left(), _ => right());
+            return either.IsLeft ? left() : right();
         }
 
         public static TOut Match<TLeft, TRight, TOut>(
@@ -32,15 +32,22 @@
             return either.IsLeft ? left(either.GetLeft()) : right(either.GetRight());
         }
 
-        public static void Match<TLeft, TRight>(this in Either<TLeft, TRight> either, Action left, Action right)
+        public static void Do<TLeft, TRight>(this in Either<TLeft, TRight> either, Action left, Action right)
         {
             Guard.NotNull(left, nameof(left));
             Guard.NotNull(right, nameof(right));
 
-            either.Match(_ => left(), _ => right());
+            if (either.IsLeft)
+            {
+                left();
+            }
+            else
+            {
+                right();
+            }
         }
 
-        public static void Match<TLeft, TRight>(
+        public static void Do<TLeft, TRight>(
             this in Either<TLeft, TRight> either,
             Action<TLeft> left,
             Action<TRight> right)
@@ -66,7 +73,7 @@
             Guard.NotNull(leftBinder, nameof(leftBinder));
             Guard.NotNull(rightBinder, nameof(rightBinder));
 
-            return Match(either, leftBinder, rightBinder);
+            return either.IsLeft ? leftBinder(either.GetLeft()) : rightBinder(either.GetRight());
         }
 
         public static IEnumerable<TLeft> AsLeftEnumerable<TLeft, TRight>(this Either<TLeft, TRight> either)
