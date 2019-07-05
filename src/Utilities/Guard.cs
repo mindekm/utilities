@@ -52,7 +52,7 @@
         /// </summary>
         /// <typeparam name="T">Type of the collection items.</typeparam>
         /// <param name="source">The collection.</param>
-        /// <param name="parameterName">Name of the parameter</param>
+        /// <param name="parameterName">Name of the parameter.</param>
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="source"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if the <paramref name="source"/> is empty.</exception>
         [ContractAnnotation("source:null => halt")]
