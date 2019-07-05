@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using Extensions;
+    using System.Runtime.CompilerServices;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -20,6 +20,7 @@
         /// <param name="parameterName">Name of the parameter.</param>
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="item"/> is null.</exception>
         [ContractAnnotation("item:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotNull<T>([NoEnumeration] T item, [InvokerParameterName] [NotNull] string parameterName)
             where T : class
         {
@@ -37,6 +38,7 @@
         /// <param name="parameterName">Name of the parameter.</param>
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="item"/> is null.</exception>
         [ContractAnnotation("item:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotNull<T>([NoEnumeration] T? item, [InvokerParameterName] [NotNull] string parameterName)
             where T : struct
         {
@@ -56,10 +58,18 @@
         /// <exception cref="ArgumentNullException">Thrown if the <paramref name="source"/> is null.</exception>
         /// <exception cref="ArgumentException">Thrown if the <paramref name="source"/> is empty.</exception>
         [ContractAnnotation("source:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotNullOrEmpty<T>(ICollection<T> source, [InvokerParameterName] [NotNull] string parameterName)
         {
-            Ensure.That(source).IsNotNull(Error.NullArgument(parameterName));
-            Ensure.That(source).IsNotEmpty(Error.EmptyCollectionArgument(parameterName));
+            if (source is null)
+            {
+                throw Error.NullArgument(parameterName);
+            }
+
+            if (source.Count == 0)
+            {
+                throw Error.EmptyCollectionArgument(parameterName);
+            }
         }
 
         /// <summary>
@@ -72,10 +82,18 @@
         /// <exception cref="ArgumentException">Thrown if the <paramref name="item"/> is
         /// empty or whitespace.</exception>
         [ContractAnnotation("item:null => halt")]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotEmpty(string item, [InvokerParameterName] [NotNull] string parameterName)
         {
-            Ensure.That(item).IsNotNull(Error.NullArgument(parameterName));
-            Ensure.That(item).IsNotEmpty(Error.EmptyStringArgument(parameterName));
+            if (item is null)
+            {
+                throw Error.NullArgument(parameterName);
+            }
+
+            if (item.Trim().Length == 0)
+            {
+                throw Error.EmptyStringArgument(parameterName);
+            }
         }
     }
 }
