@@ -1,44 +1,49 @@
 ﻿namespace Utilities.Test.Either
 {
-    using NUnit.Framework;
     using Shouldly;
+    using Xunit;
+    using Either = Utilities.Either;
 
-    [TestFixture]
     public class HashCode
     {
-        [Test]
+        [Fact]
         public void Either_GetHashCode_LeftAndRightHashCodesShouldNotBeTheSame()
         {
-            var left = Either<string, string>.Left("value");
-            var right = Either<string, string>.Right("value");
+            Either<string, string> left = Either.Left("value");
+            Either<string, string> right = Either.Right("value");
 
             left.GetHashCode().ShouldNotBe(right.GetHashCode());
+            left.ShouldNotBe(right);
         }
 
-        [Test]
+        [Fact]
         public void Either_GetHashCode_LeftHashCodeShouldBeEqualToItsCopy()
         {
-            var left = Either<string, string>.Left("left value");
-            var copy = left;
+            Either<string, string> left = Either.Left("left value");
+            Either<string, string> copy = Either.Left("left value");
 
             left.GetHashCode().ShouldBe(copy.GetHashCode());
+            left.ShouldBe(copy);
         }
 
-        [Test]
+        [Fact]
         public void Either_GetHashCode_RightHashCodeShouldBeEqualToItsCopy()
         {
-            var right = Either<string, string>.Right("right value");
-            var copy = right;
+            Either<string, string> right = Either.Right("right value");
+            Either<string, string> copy = Either.Right("right value");
 
             right.GetHashCode().ShouldBe(copy.GetHashCode());
+            right.ShouldBe(copy);
         }
 
-        [Test]
-        public void Either_GetHashCode_NeitherHashCodeShouldBeZero()
+        [Fact]
+        public void Either_GetHashCode_UninitializedValuesShouldBeEqual()
         {
-            Either<string, string> neither = default;
+            Either<string, string> default1 = default;
+            Either<string, string> default2 = default;
 
-            neither.GetHashCode().ShouldBe(0);
+            default1.GetHashCode().ShouldBe(default2.GetHashCode());
+            default1.ShouldBe(default2);
         }
     }
 }

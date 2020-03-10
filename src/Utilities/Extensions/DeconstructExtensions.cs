@@ -1,7 +1,9 @@
 ﻿namespace Utilities.Extensions
 {
     using System.Collections.Generic;
+    using System.ComponentModel;
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public static class DeconstructExtensions
     {
         public static void Deconstruct<T>(this T? nullable, out bool hasValue, out T value)

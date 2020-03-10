@@ -1,51 +1,49 @@
-﻿namespace Utilities.Test
+﻿namespace Utilities.Test.Maybe
 {
     using System.Text;
     using Utilities;
-    using NUnit.Framework;
     using Shouldly;
+    using Xunit;
 
-    [TestFixture]
     public class SomeEquality
     {
         private readonly Maybe<string> some = Maybe.Some("test");
 
-        [Test]
+        [Fact]
         public void Some_ShouldBeEqualToSelf()
         {
             some.Equals(some).ShouldBeTrue();
             some.Equals((object)some).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void Some_ShouldBeEqualToOtherSome()
         {
-            some.Equals(Maybe.Some(some.GetValue())).ShouldBeTrue();
-            some.Equals((object)Maybe.Some(some.GetValue())).ShouldBeTrue();
+            some.Equals(Maybe.Some(some.Unwrap())).ShouldBeTrue();
+            some.Equals((object)Maybe.Some(some.Unwrap())).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void Some_ShouldNotBeEqualToNull()
         {
             some.Equals(null).ShouldBeFalse();
-            some.Equals((object)null).ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void Some_ShouldNotBeEqualToDefaultValue()
         {
-            some.Equals(default(Maybe<string>)).ShouldBeFalse();
+            some.Equals(default).ShouldBeFalse();
             some.Equals((object)default(Maybe<string>)).ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void Some_ShouldNotBeEqualToNone()
         {
-            some.Equals(Maybe.None<string>()).ShouldBeFalse();
-            some.Equals((object)Maybe.None<string>()).ShouldBeFalse();
+            some.Equals(Maybe.None).ShouldBeFalse();
+            some.Equals((object)default(Maybe<string>)).ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void Some_ShouldNotBeEqualToSomeOtherType()
         {
             some.Equals(Maybe.Some(new StringBuilder())).ShouldBeFalse();

@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Runtime.CompilerServices;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -13,87 +12,208 @@
     public static class Guard
     {
         /// <summary>
-        /// Asserts that the <paramref name="item"/> is not null. Used to validate public method calls.
+        /// Asserts that the <paramref name="parameter"/> is not null.
         /// </summary>
-        /// <typeparam name="T">Type of item.</typeparam>
-        /// <param name="item">The item.</param>
+        /// <typeparam name="T">Type of the <paramref name="parameter"/>.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
         /// <param name="parameterName">Name of the parameter.</param>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="item"/> is null.</exception>
-        [ContractAnnotation("item:null => halt")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNull<T>([NoEnumeration] T item, [InvokerParameterName] [NotNull] string parameterName)
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void NotNull<T>([NoEnumeration] T parameter, [InvokerParameterName] string parameterName)
             where T : class
         {
-            if (item is null)
+            if (parameter is null)
             {
-                throw Error.NullArgument(parameterName);
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
             }
         }
 
         /// <summary>
-        /// Asserts that the <paramref name="item"/> is not null. Used to validate public method calls.
+        /// Asserts that the <paramref name="parameter"/> is not equal to its default value.
         /// </summary>
-        /// <typeparam name="T">Type of item.</typeparam>
-        /// <param name="item">The item.</param>
+        /// <typeparam name="T">Type of the <paramref name="parameter"/>.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
         /// <param name="parameterName">Name of the parameter.</param>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="item"/> is null.</exception>
-        [ContractAnnotation("item:null => halt")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNull<T>([NoEnumeration] T? item, [InvokerParameterName] [NotNull] string parameterName)
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> is equal to its default value.</exception>
+        public static void NotDefault<T>([NoEnumeration] T parameter, [InvokerParameterName] string parameterName)
+            where T : struct, IEquatable<T>
+        {
+            if (parameter.Equals(default))
+            {
+                throw new ArgumentException("Parameter cannot be equal to its default value.", Format(parameterName));
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> has value.
+        /// </summary>
+        /// <typeparam name="T">Type of the <paramref name="parameter"/>.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have value.</exception>
+        public static void HasValue<T>([NoEnumeration] T? parameter, [InvokerParameterName] string parameterName)
             where T : struct
         {
-            if (!item.HasValue)
+            if (!parameter.HasValue)
             {
-                throw Error.NullArgument(parameterName);
+                throw new ArgumentException("Parameter must have a value.", Format(parameterName));
             }
         }
 
         /// <summary>
-        /// Asserts that the <paramref name="source"/> collection is not null or empty.
-        /// Used to validate public method calls.
+        /// Asserts that the <paramref name="parameter"/> collection has elements.
         /// </summary>
-        /// <typeparam name="T">Type of the collection items.</typeparam>
-        /// <param name="source">The collection.</param>
+        /// <typeparam name="T">Type of the collection elements.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
         /// <param name="parameterName">Name of the parameter.</param>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="source"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown if the <paramref name="source"/> is empty.</exception>
-        [ContractAnnotation("source:null => halt")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotNullOrEmpty<T>(ICollection<T> source, [InvokerParameterName] [NotNull] string parameterName)
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have elements.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void HasElements<T>(ICollection<T> parameter, [InvokerParameterName] string parameterName)
         {
-            if (source is null)
+            if (parameter is null)
             {
-                throw Error.NullArgument(parameterName);
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
             }
 
-            if (source.Count == 0)
+            if (parameter.Count == 0)
             {
-                throw Error.EmptyCollectionArgument(parameterName);
+                throw new ArgumentException("Collection must have elements.", Format(parameterName));
             }
         }
 
         /// <summary>
-        /// Asserts that the <paramref name="item"/> is not null, empty or whitespace.
-        /// Used to validate public method calls.
+        /// Asserts that the <paramref name="parameter"/> List has elements.
         /// </summary>
-        /// <param name="item">The item.</param>
+        /// <typeparam name="T">Type of the List elements.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
         /// <param name="parameterName">Name of the parameter.</param>
-        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="item"/> is null.</exception>
-        /// <exception cref="ArgumentException">Thrown if the <paramref name="item"/> is
-        /// empty or whitespace.</exception>
-        [ContractAnnotation("item:null => halt")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotEmpty(string item, [InvokerParameterName] [NotNull] string parameterName)
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have elements.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void HasElements<T>(List<T> parameter, [InvokerParameterName] string parameterName)
         {
-            if (item is null)
+            if (parameter is null)
             {
-                throw Error.NullArgument(parameterName);
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
             }
 
-            if (item.Trim().Length == 0)
+            if (parameter.Count == 0)
             {
-                throw Error.EmptyStringArgument(parameterName);
+                throw new ArgumentException("List must have elements.", Format(parameterName));
             }
         }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> HashSet has elements.
+        /// </summary>
+        /// <typeparam name="T">Type of the HashSet elements.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have elements.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void HasElements<T>(HashSet<T> parameter, [InvokerParameterName] string parameterName)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
+            }
+
+            if (parameter.Count == 0)
+            {
+                throw new ArgumentException("HashSet must have elements.", Format(parameterName));
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> Dictionary has elements.
+        /// </summary>
+        /// <typeparam name="TKey">Type of the Dictionary key elements.</typeparam>
+        /// <typeparam name="TValue">Type of the Dictionary value elements.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have elements.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void HasElements<TKey, TValue>(Dictionary<TKey, TValue> parameter, [InvokerParameterName] string parameterName)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
+            }
+
+            if (parameter.Count == 0)
+            {
+                throw new ArgumentException("Dictionary must have elements.", Format(parameterName));
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> Array has elements.
+        /// </summary>
+        /// <typeparam name="T">Type of the Array elements.</typeparam>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have elements.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void HasElements<T>(T[] parameter, [InvokerParameterName] string parameterName)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
+            }
+
+            if (parameter.Length == 0)
+            {
+                throw new ArgumentException("Array must have elements.", Format(parameterName));
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> is not null or empty.
+        /// </summary>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown is the <paramref name="parameter"/> is empty.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void NotNullOrEmpty(string parameter, [InvokerParameterName] string parameterName)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
+            }
+
+            if (parameter.Length == 0)
+            {
+                throw new ArgumentException("Parameter cannot be empty.", Format(parameterName));
+            }
+        }
+
+        /// <summary>
+        /// Asserts that the <paramref name="parameter"/> is not null, empty or whitespace.
+        /// </summary>
+        /// <param name="parameter">Parameter entering the assertion.</param>
+        /// <param name="parameterName">Name of the parameter.</param>
+        /// <exception cref="ArgumentNullException">Thrown if the <paramref name="parameter"/> is null.</exception>
+        /// <exception cref="ArgumentException">Thrown is the <paramref name="parameter"/> is empty or whitespace.</exception>
+        [ContractAnnotation("parameter:null => halt")]
+        public static void NotNullOrWhitespace(string parameter, [InvokerParameterName] string parameterName)
+        {
+            if (parameter is null)
+            {
+                throw new ArgumentNullException(Format(parameterName), "Parameter cannot be null.");
+            }
+
+            if (parameter.Trim().Length == 0)
+            {
+                throw new ArgumentException("Parameter cannot be empty or whitespace", Format(parameterName));
+            }
+        }
+
+        private static string Format(string parameterName)
+            => parameterName ?? "N/A";
     }
 }

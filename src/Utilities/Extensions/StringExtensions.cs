@@ -1,13 +1,12 @@
 ﻿namespace Utilities.Extensions
 {
-    using System;
-    using System.Linq;
+    using System.Collections.Generic;
 
     public static class StringExtensions
     {
-        private static readonly string[] TrueValues = { "true", "yes", "1" };
+        private static readonly HashSet<string> TrueValues = new HashSet<string> { "TRUE", "T", "YES", "1" };
 
-        private static readonly string[] FalseValues = { "false", "no", "0" };
+        private static readonly HashSet<string> FalseValues = new HashSet<string> { "FALSE", "F", "NO", "0" };
 
         public static bool IsNullOrEmpty(this string item) => string.IsNullOrEmpty(item);
 
@@ -17,13 +16,13 @@
         {
             Guard.NotNull(item, nameof(item));
 
-            if (TrueValues.Contains(item, StringComparer.OrdinalIgnoreCase))
+            if (TrueValues.Contains(item.ToUpperInvariant()))
             {
                 result = true;
                 return true;
             }
 
-            if (FalseValues.Contains(item, StringComparer.OrdinalIgnoreCase))
+            if (FalseValues.Contains(item.ToUpperInvariant()))
             {
                 result = false;
                 return true;

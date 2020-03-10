@@ -1,4 +1,4 @@
-﻿namespace Utilities.Extensions
+﻿namespace Utilities
 {
     using System;
     using System.Collections.Generic;
@@ -26,13 +26,6 @@
                     }
 
                     break;
-                case IReadOnlyList<TSource> readOnlyList:
-                    if (readOnlyList.Count > 0)
-                    {
-                        return Maybe.Some(readOnlyList[0]);
-                    }
-
-                    break;
                 default:
                     using (var enumerator = source.GetEnumerator())
                     {
@@ -45,7 +38,7 @@
                     break;
             }
 
-            return Maybe.None<TSource>();
+            return Maybe.None;
         }
 
         /// <summary>
@@ -70,7 +63,7 @@
                 }
             }
 
-            return Maybe.None<TSource>();
+            return Maybe.None;
         }
 
         /// <summary>
@@ -84,22 +77,13 @@
         {
             Guard.NotNull(source, nameof(source));
 
-            int count;
             switch (source)
             {
                 case IList<TSource> list:
-                    count = list.Count;
+                    var count = list.Count;
                     if (count > 0)
                     {
                         return Maybe.Some(list[count - 1]);
-                    }
-
-                    break;
-                case IReadOnlyList<TSource> readOnlyList:
-                    count = readOnlyList.Count;
-                    if (count > 0)
-                    {
-                        return Maybe.Some(readOnlyList[count - 1]);
                     }
 
                     break;
@@ -122,7 +106,7 @@
                     break;
             }
 
-            return Maybe.None<TSource>();
+            return Maybe.None;
         }
 
         /// <summary>
@@ -138,7 +122,7 @@
             Guard.NotNull(source, nameof(source));
             Guard.NotNull(predicate, nameof(predicate));
 
-            var result = Maybe.None<TSource>();
+            Maybe<TSource> result = Maybe.None;
             foreach (var element in source)
             {
                 if (predicate(element))
@@ -167,16 +151,8 @@
                 case IList<TSource> list:
                     switch (list.Count)
                     {
-                        case 0: return Maybe.None<TSource>();
+                        case 0: return Maybe.None;
                         case 1: return Maybe.Some(list[0]);
-                    }
-
-                    break;
-                case IReadOnlyList<TSource> readOnlyList:
-                    switch (readOnlyList.Count)
-                    {
-                        case 0: return Maybe.None<TSource>();
-                        case 1: return Maybe.Some(readOnlyList[0]);
                     }
 
                     break;
@@ -185,7 +161,7 @@
                     {
                         if (!enumerable.MoveNext())
                         {
-                            return Maybe.None<TSource>();
+                            return Maybe.None;
                         }
 
                         var result = Maybe.Some(enumerable.Current);
@@ -198,7 +174,7 @@
                     break;
             }
 
-            throw Error.TooManyElements();
+            throw new InvalidOperationException("Sequence contains more than one element.");
         }
 
         /// <summary>
@@ -215,7 +191,7 @@
             Guard.NotNull(source, nameof(source));
             Guard.NotNull(predicate, nameof(source));
 
-            var result = Maybe.None<TSource>();
+            Maybe<TSource> result = Maybe.None;
             long count = 0;
             foreach (var element in source)
             {
@@ -231,11 +207,10 @@
 
             switch (count)
             {
-                case 0: return Maybe.None<TSource>();
+                case 0: return Maybe.None;
                 case 1: return result;
+                default: throw new InvalidOperationException("Sequence contains more than one matching element.");
             }
-
-            throw Error.TooManyElements();
         }
 
         /// <summary>
@@ -261,13 +236,6 @@
                         }
 
                         break;
-                    case IReadOnlyList<TSource> readOnlyList:
-                        if (index < readOnlyList.Count)
-                        {
-                            return Maybe.Some(readOnlyList[index]);
-                        }
-
-                        break;
                     default:
                         foreach (var item in source)
                         {
@@ -283,7 +251,7 @@
                 }
             }
 
-            return Maybe.None<TSource>();
+            return Maybe.None;
         }
     }
 }

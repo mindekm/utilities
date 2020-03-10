@@ -9,11 +9,6 @@
     {
         public FailureDetails(T details, FailureLevel level = FailureLevel.Error)
         {
-            if (ReferenceEquals(details, null))
-            {
-                throw Error.NullArgument(nameof(details));
-            }
-
             Details = details;
             Level = level;
         }
