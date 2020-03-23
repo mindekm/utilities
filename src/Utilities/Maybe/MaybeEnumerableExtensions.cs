@@ -205,12 +205,12 @@
                 }
             }
 
-            switch (count)
+            return count switch
             {
-                case 0: return Maybe.None;
-                case 1: return result;
-                default: throw new InvalidOperationException("Sequence contains more than one matching element.");
-            }
+                0 => Maybe.None,
+                1 => result,
+                _ => throw new InvalidOperationException("Sequence contains more than one matching element.")
+            };
         }
 
         /// <summary>
