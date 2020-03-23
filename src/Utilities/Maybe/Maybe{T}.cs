@@ -4,17 +4,14 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
     using System.Runtime.Serialization;
-
-    using Extensions;
 
     [Serializable]
     public readonly struct Maybe<T> : IEquatable<Maybe<T>>, ISerializable
     {
         private readonly T value;
 
-        private Maybe(T value)
+        internal Maybe(T value)
         {
             this.value = value;
             IsSome = true;
@@ -24,7 +21,7 @@
         {
             if (serializationInfo.GetBoolean(nameof(IsSome)))
             {
-                value = (T)serializationInfo.GetValue(nameof(value), typeof(T));
+                value = (T)serializationInfo.GetValue(nameof(IsSome), typeof(T));
                 IsSome = true;
             }
             else
@@ -38,34 +35,25 @@
 
         public bool IsNone => !IsSome;
 
-        public static implicit operator Maybe<T>(T value) => ReferenceEquals(value, null) ? default : new Maybe<T>(value);
+        public static implicit operator Maybe<T>(NoneOption none) => default;
 
-        public static explicit operator T(in Maybe<T> maybe)
-            => maybe.IsSome ? maybe.value : throw Error.InvalidCast(maybe.ToString(), typeof(T));
+        public static bool operator ==(Maybe<T> left, Maybe<T> right) => left.Equals(right);
 
-        public static bool operator ==(in Maybe<T> left, in Maybe<T> right) => left.Equals(right);
+        public static bool operator !=(Maybe<T> left, Maybe<T> right) => !left.Equals(right);
 
-        public static bool operator !=(in Maybe<T> left, in Maybe<T> right) => !left.Equals(right);
-
-        public static Maybe<T> Some(T value) => new Maybe<T>(value);
-
-        public static Maybe<T> None() => default;
-
-        [Pure]
         [DebuggerStepThrough]
-        public T GetValue()
+        public T Unwrap()
         {
             if (IsSome)
             {
                 return value;
             }
 
-            throw new InvalidOperationException($"Cannot retrieve value from {ToString()}");
+            throw new InvalidOperationException($"Cannot unwrap None<{typeof(T).Name}>.");
         }
 
-        [Pure]
         [DebuggerStepThrough]
-        public bool TryGetValue(out T result)
+        public bool TryUnwrap(out T result)
         {
             if (IsSome)
             {
@@ -77,53 +65,154 @@
             return false;
         }
 
-        [Pure]
         [DebuggerStepThrough]
-        public T GetValueOrDefault() => this.Match(value, default);
+        public T UnwrapOrDefault() => IsSome ? value : default;
 
-        [Pure]
-        [DebuggerStepThrough]
-        public T GetValueOr(T alternative) => this.Match(value, alternative);
+        public TOut Match<TOut>(TOut onSome, TOut onNone) => IsSome ? onSome : onNone;
 
-        [Pure]
-        [DebuggerStepThrough]
-        public T GetValueOr(Func<T> alternativeFactory)
+        public TOut Match<TOut>(Func<T, TOut> onSome, Func<TOut> onNone)
         {
-            Guard.NotNull(alternativeFactory, nameof(alternativeFactory));
+            Guard.NotNull(onSome, nameof(onSome));
+            Guard.NotNull(onNone, nameof(onNone));
 
-            return this.Match(value, alternativeFactory());
+            return IsSome ? onSome(value) : onNone();
         }
 
-        public bool Equals(Maybe<T> other)
-            => IsSome == other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
-
-        public override bool Equals(object obj)
+        public Maybe<T> Do(Action onSome, Action onNone)
         {
-            switch (obj)
+            Guard.NotNull(onSome, nameof(onSome));
+            Guard.NotNull(onNone, nameof(onNone));
+
+            if (IsSome)
             {
-                case null:
-                    return IsNone;
-                case Maybe<T> other:
-                    return Equals(other);
-                default:
-                    return false;
+                onSome();
+            }
+            else
+            {
+                onNone();
+            }
+
+            return this;
+        }
+
+        public Maybe<T> Do(Action<T> onSome, Action onNone)
+        {
+            Guard.NotNull(onSome, nameof(onSome));
+            Guard.NotNull(onNone, nameof(onNone));
+
+            if (IsSome)
+            {
+                onSome(value);
+            }
+            else
+            {
+                onNone();
+            }
+
+            return this;
+        }
+
+        public Maybe<T> DoOnSome(Action onSome)
+        {
+            Guard.NotNull(onSome, nameof(onSome));
+
+            if (IsSome)
+            {
+                onSome();
+            }
+
+            return this;
+        }
+
+        public Maybe<T> DoOnSome(Action<T> onSome)
+        {
+            Guard.NotNull(onSome, nameof(onSome));
+
+            if (IsSome)
+            {
+                onSome(value);
+            }
+
+            return this;
+        }
+
+        public Maybe<T> DoOnNone(Action onNone)
+        {
+            Guard.NotNull(onNone, nameof(onNone));
+
+            if (IsNone)
+            {
+                onNone();
+            }
+
+            return this;
+        }
+
+        public Maybe<T> DoOnBoth(Action onBoth)
+        {
+            Guard.NotNull(onBoth, nameof(onBoth));
+
+            onBoth();
+
+            return this;
+        }
+
+        public Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> someBinder, Func<Maybe<TOut>> noneBinder)
+        {
+            Guard.NotNull(someBinder, nameof(someBinder));
+            Guard.NotNull(noneBinder, nameof(noneBinder));
+
+            return IsSome ? someBinder(value) : noneBinder();
+        }
+
+        public Maybe<TOut> BindOnSome<TOut>(Func<T, Maybe<TOut>> binder)
+        {
+            Guard.NotNull(binder, nameof(binder));
+
+            return IsSome ? binder(value) : Maybe.None;
+        }
+
+        public Maybe<T> BindOnNone(Func<Maybe<T>> binder)
+        {
+            Guard.NotNull(binder, nameof(binder));
+
+            return IsNone ? binder() : this;
+        }
+
+        public IEnumerable<T> AsEnumerable()
+        {
+            if (IsSome)
+            {
+                yield return value;
             }
         }
 
+        public bool Equals(Maybe<T> other)
+        {
+            if (IsNone && other.IsNone)
+            {
+                return true;
+            }
+
+            return IsSome && other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
+        }
+
+        public override bool Equals(object obj) => obj is Maybe<T> other && Equals(other);
+
         public override int GetHashCode() => IsSome ? EqualityComparer<T>.Default.GetHashCode(value) : 0;
 
-        public override string ToString() => IsSome ? value.ToString() : $"None<{typeof(T).Name}>";
+        public override string ToString() => IsSome ? $"Some<{typeof(T).Name}>: {value}" : $"None<{typeof(T).Name}>";
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public void GetObjectData(SerializationInfo serializationInfo, StreamingContext context)
         {
-            info.AddValue(nameof(IsSome), IsSome);
+            serializationInfo.AddValue(nameof(IsSome), IsSome);
             if (IsSome)
             {
-                info.AddValue(nameof(value), value);
+                serializationInfo.AddValue(nameof(value), value);
             }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public void Deconstruct(out bool isSome, out T maybeValue) => (isSome, maybeValue) = (IsSome, value);
+        public void Deconstruct(out bool isSome, out T value) => (isSome, value) = (IsSome, this.value);
     }
 }

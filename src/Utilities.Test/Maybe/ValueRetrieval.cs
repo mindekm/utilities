@@ -1,72 +1,54 @@
-﻿namespace Utilities.Test
+﻿namespace Utilities.Test.Maybe
 {
     using System;
     using Utilities;
-    using NUnit.Framework;
     using Shouldly;
+    using Xunit;
 
-    [TestFixture]
     public class ValueRetrieval
     {
-        [Test]
+        [Fact]
         public void Maybe_TryGet_ShouldReturnTrueForSome()
         {
             const string Expected = "Test";
 
-            Maybe.Some(Expected).TryGetValue(out var result).ShouldBeTrue();
+            Maybe.Some(Expected).TryUnwrap(out var result).ShouldBeTrue();
             result.ShouldBe(Expected);
         }
 
-        [Test]
+        [Fact]
         public void Maybe_TryGet_ShouldReturnFalseForNone()
         {
-            Maybe.None<string>().TryGetValue(out var result).ShouldBeFalse();
+            default(Maybe<string>).TryUnwrap(out var result).ShouldBeFalse();
             result.ShouldBe(default);
         }
 
-        [Test]
+        [Fact]
         public void Maybe_Value_ShouldThrowForNone()
         {
-            Should.Throw<InvalidOperationException>(() => Maybe.None<string>().GetValue());
+            Should.Throw<InvalidOperationException>(() => default(Maybe<string>).Unwrap());
         }
 
-        [Test]
+        [Fact]
         public void Maybe_Value_ShouldReturnValueForSome()
         {
             const string Expected = "Test";
 
-            Maybe.Some(Expected).GetValue().ShouldBe(Expected);
+            Maybe.Some(Expected).Unwrap().ShouldBe(Expected);
         }
 
-        [Test]
-        public void Maybe_ExplicitCast_ShouldThrowForNone()
-        {
-            Should.Throw<InvalidCastException>(() =>
-            {
-                var result = (string)Maybe.None<string>();
-            });
-        }
-
-        [Test]
-        public void Maybe_ExplicitCast_ShouldReturnValueForSome()
-        {
-            const string Expected = "Test";
-
-            ((string)Maybe.Some(Expected)).ShouldBe(Expected);
-        }
-
-        [Test]
+        [Fact]
         public void Maybe_OrDefault_ShouldReturnValueForSome()
         {
             const string Expected = "Test";
 
-            Maybe.Some(Expected).GetValueOrDefault().ShouldBe(Expected);
+            Maybe.Some(Expected).UnwrapOrDefault().ShouldBe(Expected);
         }
 
-        [Test]
+        [Fact]
         public void Maybe_OrDefault_ShouldReturnDefaultForNone()
         {
-            Maybe.None<string>().GetValueOrDefault().ShouldBe(default);
+            default(Maybe<string>).UnwrapOrDefault().ShouldBe(default);
         }
     }
 }

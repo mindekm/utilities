@@ -1,49 +1,38 @@
 ﻿namespace Utilities.Test.Either
 {
-    using NUnit.Framework;
     using Shouldly;
+    using Xunit;
+    using Either = Utilities.Either;
 
-    [TestFixture]
     public class Equality
     {
-        [Test]
+        [Fact]
         public void Either_LeftCaseShouldBeEqualToItsCopy()
         {
-            var either = Either<string, string>.Left("left value");
-            var copy = either;
+            Either<string, string> either = Either.Left("left value");
+            Either<string, string> copy = Either.Left("left value");
 
             either.Equals(copy).ShouldBeTrue();
             (either == copy).ShouldBeTrue();
             either.Equals((object)copy).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void Either_RightCaseShouldBeEqualToItsCopy()
         {
-            var either = Either<string, string>.Right("right value");
-            var copy = either;
+            Either<string, string> either = Either.Right("right value");
+            Either<string, string> copy = Either.Right("right value");
 
             either.Equals(copy).ShouldBeTrue();
             (either == copy).ShouldBeTrue();
             either.Equals((object)copy).ShouldBeTrue();
         }
 
-        [Test]
-        public void Either_NeitherCaseShouldBeEqualToItsCopy()
-        {
-            Either<string, string> either = default;
-            var copy = either;
-
-            either.Equals(copy).ShouldBeTrue();
-            (either == copy).ShouldBeTrue();
-            either.Equals((object)copy).ShouldBeTrue();
-        }
-
-        [Test]
+        [Fact]
         public void Either_LeftCaseShouldNotBeEqualToRightCase()
         {
-            var left = Either<string, string>.Left("value");
-            var right = Either<string, string>.Right("value");
+            Either<string, string> left = Either.Left("value");
+            Either<string, string> right = Either.Right("value");
 
             left.Equals(right).ShouldBeFalse();
             (left != right).ShouldBeTrue();
@@ -52,18 +41,6 @@
             right.Equals(left).ShouldBeFalse();
             (right != left).ShouldBeTrue();
             right.Equals((object)left).ShouldBeFalse();
-        }
-
-        [Test]
-        public void Either_ShouldNotEqualItsUnderlyingValue()
-        {
-            var either = Either<string, string>.Left("left value");
-
-            either.Equals((object)"left value").ShouldBeFalse();
-
-            var nullEither = Either<string, string>.Right(null);
-
-            nullEither.Equals((object)null).ShouldBeFalse();
         }
     }
 }

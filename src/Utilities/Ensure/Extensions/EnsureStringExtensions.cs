@@ -68,5 +68,21 @@
                 throw exception;
             }
         }
+
+        public static void DoesNotContainWhitespace(this in That<string> that)
+            => that.DoesNotContainWhitespace(Error.EnsureFailure());
+
+        public static void DoesNotContainWhitespace(this in That<string> that, Exception exception)
+        {
+            Guard.NotNull(exception, nameof(exception));
+
+            foreach (var character in that.Item)
+            {
+                if (char.IsWhiteSpace(character))
+                {
+                    throw exception;
+                }
+            }
+        }
     }
 }

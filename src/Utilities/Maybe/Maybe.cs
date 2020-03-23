@@ -1,19 +1,9 @@
 ﻿namespace Utilities
 {
-    using System;
-
     public static class Maybe
     {
-        public static Maybe<T> Some<T>(T value)
-        {
-            if (ReferenceEquals(value, null))
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
+        public static NoneOption None { get; } = default;
 
-            return Maybe<T>.Some(value);
-        }
-
-        public static Maybe<T> None<T>() => Maybe<T>.None();
+        public static Maybe<T> Some<T>(T value) => new Maybe<T>(value);
     }
 }
