@@ -4,6 +4,9 @@
 
     public static class MaybeExtensions
     {
+        public static Maybe<T> AsSome<T>(this T value)
+            => Maybe.Some(value);
+
         public static Maybe<T> ToMaybe<T>(this T value)
             where T : class => value is null ? Maybe.None : Maybe.Some(value);
 

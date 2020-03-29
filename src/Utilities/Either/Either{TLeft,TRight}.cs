@@ -123,16 +123,6 @@
         [DebuggerStepThrough]
         public TRight UnwrapRightOrDefault() => IsRight ? rightValue : default;
 
-        public TOut Match<TOut>(TOut onLeft, TOut onRight)
-        {
-            return state switch
-            {
-                EitherState.Left => onLeft,
-                EitherState.Right => onRight,
-                _ => throw UninitializedException(),
-            };
-        }
-
         public TOut Match<TOut>(Func<TLeft, TOut> onLeft, Func<TRight, TOut> onRight)
         {
             Guard.NotNull(onLeft, nameof(onLeft));
