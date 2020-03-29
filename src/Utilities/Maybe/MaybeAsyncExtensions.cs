@@ -6,25 +6,6 @@
 
     public static class MaybeAsyncExtensions
     {
-        public static async Task<TOut> MatchAsync<TIn, TOut>(this Task<Maybe<TIn>> maybe, TOut some, TOut none)
-        {
-            Guard.NotNull(maybe, nameof(maybe));
-
-            return (await maybe.ConfigureAwait(false)).Match(some, none);
-        }
-
-        public static async Task<TOut> MatchAsync<TIn, TOut>(this Maybe<TIn> maybe, Task<TOut> some, Task<TOut> none)
-        {
-            return await maybe.Match(some, none).ConfigureAwait(false);
-        }
-
-        public static async Task<TOut> MatchAsync<TIn, TOut>(this Task<Maybe<TIn>> maybe, Task<TOut> some, Task<TOut> none)
-        {
-            Guard.NotNull(maybe, nameof(maybe));
-
-            return await (await maybe.ConfigureAwait(false)).Match(some, none).ConfigureAwait(false);
-        }
-
         public static async Task<TOut> MatchAsync<TIn, TOut>(
             this Task<Maybe<TIn>> maybe,
             Func<TIn, TOut> onSome,

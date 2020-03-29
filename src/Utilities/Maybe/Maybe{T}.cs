@@ -68,8 +68,6 @@
         [DebuggerStepThrough]
         public T UnwrapOrDefault() => IsSome ? value : default;
 
-        public TOut Match<TOut>(TOut onSome, TOut onNone) => IsSome ? onSome : onNone;
-
         public TOut Match<TOut>(Func<T, TOut> onSome, Func<TOut> onNone)
         {
             Guard.NotNull(onSome, nameof(onSome));

@@ -1,7 +1,9 @@
-﻿namespace Utilities.Extensions
+﻿namespace Utilities
 {
+    using System;
     using System.Collections.Generic;
 
+    [Obsolete]
     public static class StringExtensions
     {
         private static readonly HashSet<string> TrueValues = new HashSet<string> { "TRUE", "T", "YES", "1" };
