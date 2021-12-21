@@ -1,5 +1,5 @@
 # Build status
 | Branch        | Status        |
 | ------------- |:-------------:|
-| development   | [![Build status](https://ci.appveyor.com/api/projects/status/glrnvjpc3qth79ah/branch/development?svg=true)](https://ci.appveyor.com/project/mindekm/utilities/branch/development) |
-| master        | [![Build status](https://ci.appveyor.com/api/projects/status/glrnvjpc3qth79ah/branch/development?svg=true)](https://ci.appveyor.com/project/mindekm/utilities/branch/master)      |
+| development   | [![Build & Run Tests](https://github.com/mindekm/utilities/actions/workflows/ci.yml/badge.svg)](https://github.com/mindekm/utilities/actions/workflows/ci.yml) |
+| master        | - |
