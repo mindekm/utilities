@@ -1,15 +1,11 @@
-﻿namespace Utilities
+﻿namespace Utilities;
+
+public class FailureMessage : FailureDetails<string>
 {
-    using System;
+    public static readonly FailureMessage Unspecified = new FailureMessage("Unspecified error has occured.");
 
-    [Serializable]
-    public class FailureMessage : FailureDetails<string>
+    public FailureMessage(string details, FailureLevel level = FailureLevel.Error)
+        : base(details, level)
     {
-        public static readonly FailureMessage Unspecified = new FailureMessage("Unspecified error has occured.");
-
-        public FailureMessage(string details, FailureLevel level = FailureLevel.Error)
-            : base(details, level)
-        {
-        }
     }
 }

@@ -1,9 +1,12 @@
-﻿namespace Utilities
-{
-    public static class Maybe
-    {
-        public static NoneOption None { get; } = default;
+﻿namespace Utilities;
 
-        public static Maybe<T> Some<T>(T value) => new Maybe<T>(value);
-    }
+using System.Diagnostics.Contracts;
+
+public static class Maybe
+{
+    [Pure]
+    public static NoneOption None => default;
+
+    [Pure]
+    public static Maybe<T> Some<T>(T value) => new Maybe<T>(value);
 }

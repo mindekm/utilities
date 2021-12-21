@@ -1,9 +1,0 @@
-image: Visual Studio 2019
-
-branches:
-  only:
-    - master
-    - development
-
-build_script:
-  - ps: ./build.ps1

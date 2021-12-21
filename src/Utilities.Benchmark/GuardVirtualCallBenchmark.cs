@@ -1,30 +1,34 @@
-﻿namespace Utilities.Benchmark
+﻿using BenchmarkDotNet.Attributes;
+
+namespace Utilities.Benchmark;
+
+[MemoryDiagnoser]
+public class GuardVirtualCallBenchmark
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using BenchmarkDotNet.Attributes;
+    private HashSet<string> set;
+    private ICollection<string> collection;
 
-    public class GuardVirtualCallBenchmark
+    [GlobalSetup]
+    public void Setup()
     {
-        private readonly HashSet<string> set;
+        var list = Enumerable.Repeat(Guid.NewGuid().ToString(), 100).ToList();
+        set = new HashSet<string>(list);
+        collection = set;
+    }
 
-        public GuardVirtualCallBenchmark()
-        {
-            var list = Enumerable.Repeat(Guid.NewGuid().ToString(), 100).ToList();
-            set = new HashSet<string>(list);
-        }
+    [Benchmark(Baseline = true)]
+    public HashSet<string> SetDirect()
+    {
+        Guard.HasElements(set);
 
-        [Benchmark]
-        public void SetDirect()
-        {
-            Guard.HasElements(set, null);
-        }
+        return set;
+    }
 
-        [Benchmark]
-        public void SetVirtual()
-        {
-            Guard.HasElements((ICollection<string>)set, null);
-        }
+    [Benchmark]
+    public ICollection<string> SetVirtual()
+    {
+        Guard.HasElements(collection);
+
+        return collection;
     }
 }

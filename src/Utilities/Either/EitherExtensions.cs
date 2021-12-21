@@ -1,38 +1,31 @@
-﻿namespace Utilities
+﻿namespace Utilities;
+
+using System.Collections.Generic;
+
+public static class EitherExtensions
 {
-    using System.Collections.Generic;
-
-    public static class EitherExtensions
+    public static IEnumerable<TLeft> GetLeftValues<TLeft, TRight>(this IEnumerable<Either<TLeft, TRight>> source)
     {
-        public static LeftOption<T> AsLeft<T>(this T value)
-            => Either.Left(value);
+        Guard.NotNull(source);
 
-        public static RightOption<T> AsRight<T>(this T value)
-            => Either.Right(value);
-
-        public static IEnumerable<TLeft> GetLeftValues<TLeft, TRight>(this IEnumerable<Either<TLeft, TRight>> source)
+        foreach (var either in source)
         {
-            Guard.NotNull(source, nameof(source));
-
-            foreach (var (isLeft, left, _, _) in source)
+            if (either.TryUnwrapLeft(out var left))
             {
-                if (isLeft)
-                {
-                    yield return left;
-                }
+                yield return left;
             }
         }
+    }
 
-        public static IEnumerable<TRight> GetRightValues<TLeft, TRight>(this IEnumerable<Either<TLeft, TRight>> source)
+    public static IEnumerable<TRight> GetRightValues<TLeft, TRight>(this IEnumerable<Either<TLeft, TRight>> source)
+    {
+        Guard.NotNull(source);
+
+        foreach (var either in source)
         {
-            Guard.NotNull(source, nameof(source));
-
-            foreach (var (_, _, isRight, right) in source)
+            if (either.TryUnwrapRight(out var right))
             {
-                if (isRight)
-                {
-                    yield return right;
-                }
+                yield return right;
             }
         }
     }
