@@ -136,19 +136,19 @@ public readonly struct Either<TLeft, TRight> : IEquatable<Either<TLeft, TRight>>
         return IsRight ? rightValue : valueFactory();
     }
 
-    public TOut Match<TOut>(Func<TLeft, TOut> onLeft, Func<TRight, TOut> onRight)
+    public TOut? Match<TOut>(Func<TLeft, TOut?> onLeft, Func<TRight, TOut?> onRight)
     {
         Guard.NotNull(onLeft);
         Guard.NotNull(onRight);
 
         if (IsRight)
         {
-            onRight(rightValue);
+            return onRight(rightValue);
         }
 
         if (IsLeft)
         {
-            onLeft(leftValue);
+            return onLeft(leftValue);
         }
 
         throw UninitializedException();
