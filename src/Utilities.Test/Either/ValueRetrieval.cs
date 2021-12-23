@@ -98,4 +98,20 @@ public class ValueRetrieval
         Either<string, string> either = Either.Left("left value");
         either.UnwrapRightOrDefault().ShouldBe(default);
     }
+
+    [Fact]
+    public void Either_Match_ShouldMatchOnLeftCase()
+    {
+        Either<string, string> either = Either.Left("left value");
+        
+        either.Match(left => left, right => right).ShouldBe("left value");
+    }
+
+    [Fact]
+    public void Either_Match_ShouldMatchOnRightCase()
+    {
+        Either<string, string> either = Either.Right("right value");
+        
+        either.Match(left => left, right => right).ShouldBe("right value");
+    }
 }
