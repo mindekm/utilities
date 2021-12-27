@@ -1,63 +1,51 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Utilities</AssemblyName>  
-    <Version>0.1.0-alpha3</Version>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Utilities</RootNamespace>
-    <LangVersion>latest</LangVersion>	
-    <Product>Utilities</Product>	
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <CodeAnalysisRuleSet>Stylecop.ruleset</CodeAnalysisRuleSet>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<CodeAnalysisRuleSet>Stylecop.ruleset</CodeAnalysisRuleSet>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <PropertyGroup>
     <PackageId>MM.Utilities</PackageId>
-    <Title></Title>
+    <Title>MM.Utilities</Title>
     <Description>Various utility classes.</Description>
     <Authors>Milan Mindek</Authors>
-    <Copyright>2019 Milan Mindek</Copyright>      
+    <Copyright>2019 Milan Mindek</Copyright>
     <PackageProjectUrl>https://github.com/mindekm/utilities</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mindekm/utilities</RepositoryUrl>
-    <RepositoryType>Git</RepositoryType>    
+    <RepositoryType>Git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageLicenceFile>../../LICENCE.md</PackageLicenceFile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\$(TargetFramework)\Utilities.xml</DocumentationFile>
-    <NoWarn>1701;1702;1591</NoWarn>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>TRACE;CONTRACTS_FULL</DefineConstants>
+    <DocumentationFile>bin\Debug\Utilities.xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\$(TargetFramework)\Utilities.xml</DocumentationFile>
-    <DefineConstants>TRACE</DefineConstants>
-    <NoWarn>1701;1702;1591</NoWarn>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>TRACE;CONTRACTS_FULL</DefineConstants>
+    <DocumentationFile>bin\Release\Utilities.xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="stylecop.json" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Utilities.csproj.DotSettings" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Roslynator.Analyzers" Version="2.2.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Roslynator.CodeFixes" Version="2.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
 </Project>

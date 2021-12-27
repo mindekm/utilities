@@ -1,15 +1,4 @@
-﻿namespace Utilities.Benchmark
-{
-    using System;
-    using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
+using Utilities.Benchmark;
 
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            BenchmarkRunner.Run<GuardVirtualCallBenchmark>();
-
-            Console.ReadKey();
-        }
-    }
-}
+BenchmarkRunner.Run<GuardNotNullGenericsBenchmark>();

@@ -1,10 +1,9 @@
-﻿namespace Utilities
+﻿namespace Utilities;
+
+public enum FailureLevel
 {
-    public enum FailureLevel
-    {
-        Info,
-        Warn,
-        Error,
-        Fatal,
-    }
+    Info,
+    Warn,
+    Error,
+    Fatal,
 }

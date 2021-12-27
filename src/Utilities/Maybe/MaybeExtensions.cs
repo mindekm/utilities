@@ -1,34 +1,35 @@
-﻿namespace Utilities
+﻿namespace Utilities;
+
+using System.Diagnostics.Contracts;
+
+public static class MaybeExtensions
 {
-    using System.Collections.Generic;
+    [Pure]
+    public static Maybe<T> ToMaybe<T>(this T? value)
+        where T : class => value is null ? Maybe.None : Maybe.Some(value);
 
-    public static class MaybeExtensions
+    [Pure]
+    public static Maybe<T> ToMaybe<T>(this T? value)
+        where T : struct => value.HasValue ? Maybe.Some(value.Value) : Maybe.None;
+
+    [Pure]
+    public static T? ToNullable<T>(this Maybe<T> maybe)
+        where T : struct => maybe.Match(value => new T?(value), () => default);
+
+    [Pure]
+    public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe)
+        => maybe.Match(some => some, () => Maybe.None);
+
+    [Pure]
+    public static IEnumerable<T> GetValues<T>(this IEnumerable<Maybe<T>> source)
     {
-        public static Maybe<T> AsSome<T>(this T value)
-            => Maybe.Some(value);
+        Guard.NotNull(source);
 
-        public static Maybe<T> ToMaybe<T>(this T value)
-            where T : class => value is null ? Maybe.None : Maybe.Some(value);
-
-        public static Maybe<T> ToMaybe<T>(this T? value)
-            where T : struct => value.HasValue ? Maybe.Some(value.Value) : Maybe.None;
-
-        public static T? ToNullable<T>(this in Maybe<T> maybe)
-            where T : struct => maybe.Match(value => new T?(value), () => default);
-
-        public static Maybe<T> Flatten<T>(this in Maybe<Maybe<T>> maybe)
-            => maybe.Match(some => some, () => Maybe.None);
-
-        public static IEnumerable<T> GetValues<T>(this IEnumerable<Maybe<T>> source)
+        foreach (var maybe in source)
         {
-            Guard.NotNull(source, nameof(source));
-
-            foreach (var (isSome, value) in source)
+            if (maybe.TryUnwrap(out var value))
             {
-                if (isSome)
-                {
-                    yield return value;
-                }
+                yield return value;
             }
         }
     }
