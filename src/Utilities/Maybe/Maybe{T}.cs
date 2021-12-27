@@ -80,7 +80,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome && other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
     }
 
-    public TOut Match<TOut>(Func<T, TOut> onSome, Func<TOut> onNone)
+    public TOut? Match<TOut>(Func<T, TOut?> onSome, Func<TOut?> onNone)
     {
         Guard.NotNull(onSome);
         Guard.NotNull(onNone);
