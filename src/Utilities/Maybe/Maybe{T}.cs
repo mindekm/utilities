@@ -20,6 +20,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     [MemberNotNullWhen(true, nameof(value))]
     public bool IsSome { get; }
 
+    [MemberNotNullWhen(false, nameof(value))]
     public bool IsNone => !IsSome;
 
     public static implicit operator Maybe<T>(NoneOption none) => default;
