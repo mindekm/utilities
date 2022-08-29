@@ -303,6 +303,14 @@ public static class Guard
         }
     }
 
+    /*
+     * Back in .NET Core 2.0, the JIT added support for not inlining methods that never return.
+     * So moving the throw to a dedicated method which will not be inlined, increases the chance that your method will be inlined.
+     * Given the exception should rarely be thrown, this should have a generally positive performance,
+     * and is a common optimisation to see in very hot paths and performance-sensitive libraries.
+     *
+     *   - https://andrewlock.net/exploring-dotnet-6-part-11-callerargumentexpression-and-throw-helpers/
+     */
     [DoesNotReturn]
     private static void ThrowWhenParameterIsNull(string? parameterName)
         => throw new ArgumentNullException(parameterName, "Parameter cannot be null.");
