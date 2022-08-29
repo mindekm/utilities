@@ -1,0 +1,92 @@
+root = true
+
+[*]
+indent_style = space
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
+indent_size = 4
+end_of_line = crlf
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+
+[*.{xml,config,*proj,nuspec,props,resx,targets,yml,tasks,json}]
+indent_size = 2
+
+[*.cs]
+indent_size = 4
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+dotnet_sort_system_directives_first = true
+csharp_new_line_before_members_in_object_initializer = true
+resharper_wrap_object_and_collection_initializer_style = chop_always
+
+# Don't use this. qualifier
+dotnet_style_qualification_for_fields = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+
+# use int x = .. over Int32
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+# use int.MaxValue over Int32.MaxValue
+dotnet_style_predefined_type_for_member_access = true:suggestion
+
+# Namespace preferences
+csharp_style_namespace_declarations = file_scoped:warning
+
+# Prefer curly braces even for one line of code
+csharp_prefer_braces = true:silent
+
+# Use 'new(...)'
+dotnet_diagnostic.IDE0090.severity = none
+
+# SA1402FileMayOnlyCOntainsASingleType
+dotnet_diagnostic.SA1402.severity = warning
+
+# SA1633FileMustHaveHeader
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1101PrefixLocalCallsWithThis
+dotnet_diagnostic.SA1101.severity = none
+
+# SX1101DoNotPrefixLocalMembersWithThis
+dotnet_diagnostic.SX1101.severity = warning
+
+# CA1825: Avoid zero-length array allocations
+dotnet_diagnostic.CA1825.severity = warning
+
+# CA1829: Use Length/Count property instead of Count() when available
+dotnet_diagnostic.CA1829.severity = warning
+
+# CA1822: Member does not access instance data
+dotnet_diagnostic.CA1822.severity = suggestion
+
+# CA1848: For improved performance, use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = suggestion
+
+# SA1124DoNotUseRegions
+dotnet_diagnostic.SA1124.severity = warning
+
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1642: Constructor summary documentation should begin with standard text
+dotnet_diagnostic.SA1642.severity = none
+
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
+
+# SA1623: Property summary documentation should match accessors
+dotnet_diagnostic.SA1623.severity = none
+
+# SA1618: Generic type parameters should be documented
+dotnet_diagnostic.SA1618.severity = none

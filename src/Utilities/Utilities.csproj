@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<CodeAnalysisRuleSet>Stylecop.ruleset</CodeAnalysisRuleSet>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Version>2.0.0-preview1</Version>
   </PropertyGroup>
