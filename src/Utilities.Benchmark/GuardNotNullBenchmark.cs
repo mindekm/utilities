@@ -1,4 +1,4 @@
-﻿namespace Utilities.Benchmark;
+namespace Utilities.Benchmark;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
