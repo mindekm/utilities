@@ -1,8 +1,8 @@
-﻿namespace Utilities;
+namespace Utilities;
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.ComponentModel;
 using System.Diagnostics.Contracts;
 
 public readonly struct Maybe<T> : IEquatable<Maybe<T>>

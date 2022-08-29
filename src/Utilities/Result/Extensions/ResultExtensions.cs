@@ -1,4 +1,4 @@
-﻿namespace Utilities;
+namespace Utilities;
 
 using System;
 using System.Collections.Generic;

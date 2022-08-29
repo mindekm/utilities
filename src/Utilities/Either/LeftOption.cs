@@ -1,4 +1,4 @@
-﻿namespace Utilities;
+namespace Utilities;
 
 // Used to achieve return type inference of the Left case.
 // See implicit conversion on Either<TLeft, TRight>.

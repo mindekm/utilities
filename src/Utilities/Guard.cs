@@ -1,9 +1,9 @@
-﻿namespace Utilities;
+namespace Utilities;
 
-using JetBrains.Annotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using NotNullAttribute = System.Diagnostics.CodeAnalysis.NotNullAttribute;
 
 /// <summary>
