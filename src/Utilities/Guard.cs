@@ -1,9 +1,9 @@
-﻿namespace Utilities;
+namespace Utilities;
 
-using JetBrains.Annotations;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using NotNullAttribute = System.Diagnostics.CodeAnalysis.NotNullAttribute;
 
 /// <summary>
@@ -21,7 +21,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void NotNull(
         [NoEnumeration, NotNull] object? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -37,7 +37,7 @@ public static class Guard
     /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> is equal to its default value.</exception>
     public static void NotDefault<T>(
         [NoEnumeration] T parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
         where T : struct, IEquatable<T>
     {
         if (parameter.Equals(default))
@@ -54,7 +54,7 @@ public static class Guard
     /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> does not have value.</exception>
     public static void HasValue<T>(
         [NoEnumeration] T? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
         where T : struct
     {
         if (!parameter.HasValue)
@@ -73,7 +73,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void HasElements<T>(
         [NotNull] ICollection<T>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -96,7 +96,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void HasElements<T>(
         [NotNull] List<T>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -119,7 +119,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void HasElements<T>(
         [NotNull] HashSet<T>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -142,7 +142,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void HasElements<TKey, TValue>(
         [NotNull] Dictionary<TKey, TValue>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
         where TKey : notnull
     {
         if (parameter is null)
@@ -166,7 +166,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void HasElements<T>(
         [NotNull] T[]? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -189,7 +189,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void NotNullOrEmpty(
         [NotNull] string? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -212,7 +212,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void NotNullOrWhitespace(
         [NotNull] string? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -233,7 +233,7 @@ public static class Guard
     /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> is None.</exception>
     public static void NotNone<T>(
         Maybe<T> parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter.IsNone)
         {
@@ -249,7 +249,7 @@ public static class Guard
     /// <exception cref="ArgumentException">Thrown if the <paramref name="parameter"/> is Left.</exception>
     public static void NotLeft<TLeft, TRight>(
         Either<TLeft, TRight> parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter.IsLeft)
         {
@@ -267,7 +267,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void NotFailure<TPayload, TFailure>(
         [NotNull] Result<TPayload, TFailure>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -290,7 +290,7 @@ public static class Guard
     [ContractAnnotation("parameter:null => halt")]
     public static void NotFailure<TFailure>(
         [NotNull] Result<TFailure>? parameter,
-        [InvokerParameterName, CallerArgumentExpression("parameter")] string? parameterName = default)
+        [InvokerParameterName, CallerArgumentExpression(nameof(parameter))] string? parameterName = default)
     {
         if (parameter is null)
         {
@@ -303,6 +303,14 @@ public static class Guard
         }
     }
 
+    /*
+     * Back in .NET Core 2.0, the JIT added support for not inlining methods that never return.
+     * So moving the throw to a dedicated method which will not be inlined, increases the chance that your method will be inlined.
+     * Given the exception should rarely be thrown, this should have a generally positive performance,
+     * and is a common optimisation to see in very hot paths and performance-sensitive libraries.
+     *
+     *   - https://andrewlock.net/exploring-dotnet-6-part-11-callerargumentexpression-and-throw-helpers/
+     */
     [DoesNotReturn]
     private static void ThrowWhenParameterIsNull(string? parameterName)
         => throw new ArgumentNullException(parameterName, "Parameter cannot be null.");

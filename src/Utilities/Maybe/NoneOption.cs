@@ -1,4 +1,4 @@
-﻿namespace Utilities;
+namespace Utilities;
 
 // Used to achieve return type inference of the None case.
 // See implicit conversion on Maybe<T>.
