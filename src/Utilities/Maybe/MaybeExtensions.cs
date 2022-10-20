@@ -13,6 +13,18 @@ public static class MaybeExtensions
         where T : struct => value.HasValue ? Maybe.Some(value.Value) : Maybe.None;
 
     [Pure]
+    public static Maybe<string> ToMaybe(this string value, NoneWhen noneWhen)
+    {
+        return noneWhen switch
+        {
+            NoneWhen.Null => value is null ? Maybe.None : Maybe.Some(value),
+            NoneWhen.NullOrEmpty => string.IsNullOrEmpty(value) ? Maybe.None : Maybe.Some(value),
+            NoneWhen.NullOrWhitespace => string.IsNullOrWhiteSpace(value) ? Maybe.None : Maybe.Some(value),
+            _ => throw new ArgumentOutOfRangeException(nameof(noneWhen), noneWhen, null),
+        };
+    }
+
+    [Pure]
     public static T? ToNullable<T>(this Maybe<T> maybe)
         where T : struct => maybe.Match(value => new T?(value), () => default);
 
