@@ -45,4 +45,18 @@ public static class MaybeExtensions
             }
         }
     }
+
+    [Pure]
+    public static TCollection Add<TCollection, T>(this TCollection collection, Maybe<T> maybe)
+        where TCollection : ICollection<T>
+    {
+        Guard.NotNull(collection);
+
+        if (maybe.TryUnwrap(out var result))
+        {
+            collection.Add(result);
+        }
+
+        return collection;
+    }
 }
