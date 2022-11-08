@@ -1,5 +1,6 @@
 namespace Utilities.Benchmark;
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;

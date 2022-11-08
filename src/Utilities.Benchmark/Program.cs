@@ -1,4 +1,3 @@
 using BenchmarkDotNet.Running;
-using Utilities.Benchmark;
 
-BenchmarkRunner.Run<GuardNotNullGenericsBenchmark>();
+BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
