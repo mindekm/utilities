@@ -31,6 +31,19 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     [Pure]
     [DebuggerStepThrough]
+    public T Expect(string message) => IsSome ? value : throw new InvalidOperationException(message);
+
+    [Pure]
+    [DebuggerStepThrough]
+    public bool IsSomeAnd(Func<T, bool> predicate)
+    {
+        Guard.NotNull(predicate);
+
+        return IsSome && predicate(value);
+    }
+
+    [Pure]
+    [DebuggerStepThrough]
     public T Unwrap()
     {
         if (IsSome)
@@ -168,6 +181,29 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return this;
     }
 
+    public Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> binder)
+    {
+        Guard.NotNull(binder);
+
+        return IsSome ? binder(value) : Maybe.None;
+    }
+
+    public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Maybe<TOut> alternative)
+    {
+        Guard.NotNull(binder);
+
+        return IsSome ? binder(value) : alternative;
+    }
+
+    public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Func<Maybe<TOut>> valueFactory)
+    {
+        Guard.NotNull(binder);
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? binder(value) : valueFactory();
+    }
+
+    [Obsolete("To be removed. Use BindOr().")]
     public Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> someBinder, Func<Maybe<TOut>> noneBinder)
     {
         Guard.NotNull(someBinder);
@@ -176,6 +212,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome ? someBinder(value) : noneBinder();
     }
 
+    [Obsolete("To be removed. Use Bind().")]
     public Maybe<TOut> BindOnSome<TOut>(Func<T, Maybe<TOut>> binder)
     {
         Guard.NotNull(binder);
@@ -183,11 +220,24 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome ? binder(value) : Maybe.None;
     }
 
+    [Obsolete("To be removed.")]
     public Maybe<T> BindOnNone(Func<Maybe<T>> binder)
     {
         Guard.NotNull(binder);
 
         return IsNone ? binder() : this;
+    }
+
+    public Maybe<T> Filter(Func<T, bool> predicate)
+    {
+        Guard.NotNull(predicate);
+
+        if (IsNone)
+        {
+            return Maybe.None;
+        }
+
+        return predicate(value) ? Maybe.Some(value) : Maybe.None;
     }
 
     public IEnumerable<T> AsEnumerable()

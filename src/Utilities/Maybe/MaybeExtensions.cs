@@ -58,4 +58,24 @@ public static class MaybeExtensions
 
         return collection;
     }
+
+    public static Maybe<(T, TU)> Zip<T, TU>(this Maybe<T> maybe, Maybe<TU> other)
+    {
+        if (maybe.TryUnwrap(out var value) && other.TryUnwrap(out var otherValue))
+        {
+            return Maybe.Some((value, otherValue));
+        }
+
+        return Maybe.None;
+    }
+
+    public static (Maybe<T>, Maybe<TU>) Unzip<T, TU>(this Maybe<(T, TU)> maybe)
+    {
+        if (maybe.TryUnwrap(out var result))
+        {
+            return (Maybe.Some(result.Item1), Maybe.Some(result.Item2));
+        }
+
+        return (Maybe.None, Maybe.None);
+    }
 }
