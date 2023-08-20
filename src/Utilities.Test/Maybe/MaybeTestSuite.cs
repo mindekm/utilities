@@ -1,4 +1,4 @@
-﻿namespace Utilities.Test.Maybe;
+namespace Utilities.Test.Maybe;
 
 using System;
 using System.Collections.Generic;
@@ -153,5 +153,120 @@ public class MaybeTestSuite
     public void Maybe_GetHashCode_ShouldReturnZeroForNone()
     {
         default(Maybe<string>).GetHashCode().ShouldBe(0);
+    }
+
+    [Fact]
+    public void Maybe_Expect_ShouldThrowWithTheProvidedMessageOnNone()
+    {
+        Maybe<string> maybe = Maybe.None;
+        var message = fixture.Create<string>();
+
+        var exception = Should.Throw<InvalidOperationException>(() => maybe.Expect(message));
+        exception.Message.ShouldBe(message);
+    }
+
+    [Fact]
+    public void Maybe_Expect_ShouldReturnValueOnSome()
+    {
+        var testValue = fixture.Create<string>();
+        var maybe = Maybe.Some(testValue);
+
+        var value = Should.NotThrow(() => maybe.Expect(fixture.Create<string>()));
+        value.ShouldBe(testValue);
+    }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(4)]
+    [InlineData(6)]
+    public void Maybe_IsSomeAnd_ShouldReturnTrueWhenSomeAndPredicateIsTrue(int input)
+    {
+        var maybe = Maybe.Some(input);
+
+        var result = maybe.IsSomeAnd(v => v % 2 == 0);
+
+        result.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(5)]
+    public void Maybe_IsSomeAnd_ShouldReturnFalseWhenSomeAndPredicateIsFalse(int input)
+    {
+        var maybe = Maybe.Some(input);
+
+        var result = maybe.IsSomeAnd(v => v % 2 == 0);
+
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Maybe_IsSomeAnd_ShouldReturnFalseWhenNone()
+    {
+        Maybe<int> maybe = Maybe.None;
+
+        var result = maybe.IsSomeAnd(v => v % 2 == 0);
+
+        result.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Maybe_Bind_ShouldExecuteBinderWhenInitialIsSome()
+    {
+        var value = fixture.Create<int>();
+        var inital = Maybe.Some(value);
+
+        var result = inital.Bind(v => Maybe.Some(v + 1));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(value + 1);
+    }
+
+    [Fact]
+    public void Maybe_Bind_ShouldReturnNoneWhenInitialIsNone()
+    {
+        Maybe<int> initial = Maybe.None;
+
+        var result = initial.Bind(v => Maybe.Some(v + 1));
+
+        result.IsNone.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(2)]
+    [InlineData(4)]
+    [InlineData(6)]
+    public void Maybe_Filter_ShouldReturnSomeWhenInitialIsSomeAndPredicateIsTrue(int input)
+    {
+        var initial = Maybe.Some(input);
+
+        var result = initial.Filter(v => v % 2 == 0);
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(input);
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(3)]
+    [InlineData(5)]
+    public void Maybe_Filter_ShouldReturnNoneWhenInitialIsSomeAndPredicateIsFalse(int input)
+    {
+        var initial = Maybe.Some(input);
+
+        var result = initial.Filter(v => v % 2 == 0);
+
+        result.IsNone.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_Filter_ShouldReturnNoneWhenInitialIsNone()
+    {
+        Maybe<string> initial = Maybe.None;
+
+        var result = initial.Filter(_ => true);
+
+        result.IsNone.ShouldBeTrue();
     }
 }
