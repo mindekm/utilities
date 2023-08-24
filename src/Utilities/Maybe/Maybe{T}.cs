@@ -1,7 +1,6 @@
 namespace Utilities;
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
@@ -30,11 +29,9 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     public static bool operator !=(Maybe<T> left, Maybe<T> right) => !left.Equals(right);
 
     [Pure]
-    [DebuggerStepThrough]
     public T Expect(string message) => IsSome ? value : throw new InvalidOperationException(message);
 
     [Pure]
-    [DebuggerStepThrough]
     public bool IsSomeAnd(Func<T, bool> predicate)
     {
         Guard.NotNull(predicate);
@@ -43,7 +40,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     }
 
     [Pure]
-    [DebuggerStepThrough]
     public T Unwrap()
     {
         if (IsSome)
@@ -54,7 +50,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         throw new InvalidOperationException($"Cannot unwrap None<{typeof(T).Name}>.");
     }
 
-    [DebuggerStepThrough]
     public bool TryUnwrap([MaybeNullWhen(false)] out T result)
     {
         if (IsSome)
@@ -68,16 +63,22 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     }
 
     [Pure]
-    [DebuggerStepThrough]
     public T? UnwrapOrDefault() => IsSome ? value : default;
 
     [Pure]
-    [DebuggerStepThrough]
     public T? UnwrapOr(T? alternative) => IsSome ? value : alternative;
 
+    [Obsolete("Causes overload collisions. To be removed. Use UnwrapOrElse.")]
     [Pure]
-    [DebuggerStepThrough]
     public T? UnwrapOr(Func<T?> valueFactory)
+    {
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? value : valueFactory();
+    }
+
+    [Pure]
+    public T? UnwrapOrElse(Func<T?> valueFactory)
     {
         Guard.NotNull(valueFactory);
 
@@ -94,6 +95,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome && other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
     }
 
+    [Pure]
     public TOut? Match<TOut>(Func<T, TOut?> onSome, Func<TOut?> onNone)
     {
         Guard.NotNull(onSome);
@@ -181,6 +183,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return this;
     }
 
+    [Pure]
     public Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> binder)
     {
         Guard.NotNull(binder);
@@ -188,6 +191,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome ? binder(value) : Maybe.None;
     }
 
+    [Pure]
     public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Maybe<TOut> alternative)
     {
         Guard.NotNull(binder);
@@ -195,6 +199,16 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome ? binder(value) : alternative;
     }
 
+    [Pure]
+    public Maybe<TOut> BindOrElse<TOut>(Func<T, Maybe<TOut>> binder, Func<Maybe<TOut>> valueFactory)
+    {
+        Guard.NotNull(binder);
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? binder(value) : valueFactory();
+    }
+
+    [Obsolete("To be removed. Use BindOrElse().")]
     public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Func<Maybe<TOut>> valueFactory)
     {
         Guard.NotNull(binder);
@@ -228,6 +242,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsNone ? binder() : this;
     }
 
+    [Pure]
     public Maybe<T> Filter(Func<T, bool> predicate)
     {
         Guard.NotNull(predicate);
@@ -238,6 +253,50 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         }
 
         return predicate(value) ? Maybe.Some(value) : Maybe.None;
+    }
+
+    [Pure]
+    public Maybe<TOut> Map<TOut>(Func<T, TOut> mapper)
+    {
+        Guard.NotNull(mapper);
+
+        return IsSome ? Maybe.Some(mapper(value)) : Maybe.None;
+    }
+
+    [Pure]
+    public Maybe<TOther> And<TOther>(Maybe<TOther> other)
+    {
+        return IsNone ? Maybe.None : other;
+    }
+
+    [Pure]
+    public Maybe<T> Or(Maybe<T> other)
+    {
+        return IsSome ? this : other;
+    }
+
+    [Pure]
+    public Maybe<T> OrElse(Func<Maybe<T>> valueFactory)
+    {
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? this : valueFactory();
+    }
+
+    [Pure]
+    public Maybe<T> Xor(Maybe<T> other)
+    {
+        if (IsSome && other.IsNone)
+        {
+            return this;
+        }
+
+        if (IsNone && other.IsSome)
+        {
+            return other;
+        }
+
+        return Maybe.None;
     }
 
     public IEnumerable<T> AsEnumerable()
