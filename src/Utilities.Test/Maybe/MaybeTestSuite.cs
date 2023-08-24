@@ -269,4 +269,132 @@ public class MaybeTestSuite
 
         result.IsNone.ShouldBeTrue();
     }
+
+    [Fact]
+    public void Maybe_Map_ShouldExecuteMapperWhenInitialIsSome()
+    {
+        var value = fixture.Create<int>();
+        var inital = Maybe.Some(value);
+
+        var result = inital.Map(v => v + 1);
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(value + 1);
+    }
+
+    [Fact]
+    public void Maybe_Map_ShouldReturnNoneWhenInitialIsNone()
+    {
+        Maybe<int> initial = Maybe.None;
+
+        var result = initial.Map(v => v + 1);
+
+        result.IsNone.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_And_ShouldReturnOtherWhenInitialIsSome()
+    {
+        var first = Maybe.Some(1);
+        var second = Maybe.Some(2);
+
+        var result = first.And(second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(second);
+    }
+
+    [Fact]
+    public void Maybe_And_ShouldReturnNoneWhenInitialIsNone()
+    {
+        Maybe<int> first = Maybe.None;
+        var second = Maybe.Some(2);
+
+        var result = first.And(second);
+
+        result.IsNone.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_Or_ShouldReturnSelfWhenSome()
+    {
+        var first = Maybe.Some(1);
+        var second = Maybe.Some(2);
+
+        var result = first.Or(second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(first);
+    }
+
+    [Fact]
+    public void Maybe_Or_ShouldReturnOtherWhenNone()
+    {
+        Maybe<int> first = Maybe.None;
+        var second = Maybe.Some(2);
+
+        var result = first.Or(second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(second);
+    }
+
+    [Fact]
+    public void Maybe_OrElse_ShouldReturnSelfWhenSome()
+    {
+        var first = Maybe.Some(1);
+        var second = Maybe.Some(2);
+
+        var result = first.OrElse(() => second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(first);
+    }
+
+    [Fact]
+    public void Maybe_OrElse_ShouldExecuteValueFactoryWhenNone()
+    {
+        Maybe<int> first = Maybe.None;
+        var second = Maybe.Some(2);
+
+        var result = first.OrElse(() => second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(second);
+    }
+
+    [Fact]
+    public void Maybe_Xor_ShouldReturnSelfWhenSomeAndOtherIsNone()
+    {
+        var first = Maybe.Some(1);
+        Maybe<int> second = Maybe.None;
+
+        var result = first.Xor(second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(first);
+    }
+
+    [Fact]
+    public void Maybe_Xor_ShouldReturnOtherWhenNoneAndOtherIsSome()
+    {
+        Maybe<int> first = Maybe.None;
+        var second = Maybe.Some(2);
+
+        var result = first.Xor(second);
+
+        result.IsSome.ShouldBeTrue();
+        result.ShouldBe(second);
+    }
+
+    [Fact]
+    public void Maybe_Xor_ShouldReturnNoneWhenNoneAndOtherIsNone()
+    {
+        Maybe<int> first = Maybe.None;
+        Maybe<int> second = Maybe.None;
+
+        var result = first.Xor(second);
+
+        result.IsNone.ShouldBeTrue();
+    }
 }
