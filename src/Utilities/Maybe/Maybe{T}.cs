@@ -54,6 +54,14 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     }
 
     [Pure]
+    public bool IsSomeAnd<TState>(TState state, Func<T, TState, bool> predicate)
+    {
+        Guard.NotNull(predicate);
+
+        return IsSome && predicate(value, state);
+    }
+
+    [Pure]
     public T Unwrap()
     {
         if (IsSome)
@@ -101,12 +109,38 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     }
 
     [Pure]
+    public T? UnwrapOrElse<TState>(TState state, Func<TState, T?> valueFactory)
+    {
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? value : valueFactory(state);
+    }
+
+    [Pure]
     public TOut? Match<TOut>(Func<T, TOut?> onSome, Func<TOut?> onNone)
     {
         Guard.NotNull(onSome);
         Guard.NotNull(onNone);
 
         return IsSome ? onSome(value) : onNone();
+    }
+
+    [Pure]
+    public TOut? Match<TOut, TState>(TState state, Func<T, TState, TOut?> onSome, Func<TOut?> onNone)
+    {
+        Guard.NotNull(onSome);
+        Guard.NotNull(onNone);
+
+        return IsSome ? onSome(value, state) : onNone();
+    }
+
+    [Pure]
+    public TOut? Match<TOut, TState>(TState state, Func<T, TState, TOut?> onSome, Func<TState, TOut?> onNone)
+    {
+        Guard.NotNull(onSome);
+        Guard.NotNull(onNone);
+
+        return IsSome ? onSome(value, state) : onNone(state);
     }
 
     public Maybe<T> Do(Action onSome, Action onNone)
@@ -197,11 +231,27 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     }
 
     [Pure]
+    public Maybe<TOut> Bind<TOut, TState>(TState state, Func<T, TState, Maybe<TOut>> binder)
+    {
+        Guard.NotNull(binder);
+
+        return IsSome ? binder(value, state) : Maybe.None;
+    }
+
+    [Pure]
     public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Maybe<TOut> alternative)
     {
         Guard.NotNull(binder);
 
         return IsSome ? binder(value) : alternative;
+    }
+
+    [Pure]
+    public Maybe<TOut> BindOr<TOut, TState>(TState state, Func<T, TState, Maybe<TOut>> binder, Maybe<TOut> alternative)
+    {
+        Guard.NotNull(binder);
+
+        return IsSome ? binder(value, state) : alternative;
     }
 
     [Pure]
@@ -211,6 +261,24 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         Guard.NotNull(valueFactory);
 
         return IsSome ? binder(value) : valueFactory();
+    }
+
+    [Pure]
+    public Maybe<TOut> BindOrElse<TOut, TState>(TState state, Func<T, TState, Maybe<TOut>> binder, Func<Maybe<TOut>> valueFactory)
+    {
+        Guard.NotNull(binder);
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? binder(value, state) : valueFactory();
+    }
+
+    [Pure]
+    public Maybe<TOut> BindOrElse<TOut, TState>(TState state, Func<T, TState, Maybe<TOut>> binder, Func<TState, Maybe<TOut>> valueFactory)
+    {
+        Guard.NotNull(binder);
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? binder(value, state) : valueFactory(state);
     }
 
     [Obsolete("To be removed. Use BindOrElse().")]
@@ -257,7 +325,20 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
             return Maybe.None;
         }
 
-        return predicate(value) ? Maybe.Some(value) : Maybe.None;
+        return predicate(value) ? this : Maybe.None;
+    }
+
+    [Pure]
+    public Maybe<T> Filter<TState>(TState state, Func<T, TState, bool> predicate)
+    {
+        Guard.NotNull(predicate);
+
+        if (IsNone)
+        {
+            return Maybe.None;
+        }
+
+        return predicate(value, state) ? this : Maybe.None;
     }
 
     [Pure]
@@ -266,6 +347,14 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         Guard.NotNull(mapper);
 
         return IsSome ? Maybe.Some(mapper(value)) : Maybe.None;
+    }
+
+    [Pure]
+    public Maybe<TOut> Map<TOut, TState>(TState state, Func<T, TState, TOut> mapper)
+    {
+        Guard.NotNull(mapper);
+
+        return IsSome ? Maybe.Some(mapper(value, state)) : Maybe.None;
     }
 
     [Pure]
@@ -286,6 +375,14 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         Guard.NotNull(valueFactory);
 
         return IsSome ? this : valueFactory();
+    }
+
+    [Pure]
+    public Maybe<T> OrElse<TState>(TState state, Func<TState, Maybe<T>> valueFactory)
+    {
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? this : valueFactory(state);
     }
 
     [Pure]
