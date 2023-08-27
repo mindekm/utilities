@@ -13,8 +13,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     internal Maybe(T value)
     {
-        Guard.NotNull(value);
-
         this.value = value;
         IsSome = true;
     }

@@ -6,20 +6,20 @@ public static class MaybeExtensions
 {
     [Pure]
     public static Maybe<T> ToMaybe<T>(this T? value)
-        where T : class => value is null ? Maybe.None : Maybe.Some(value);
+        where T : class => value is null ? Maybe.None : Maybe.UnsafeSome(value);
 
     [Pure]
     public static Maybe<T> ToMaybe<T>(this T? value)
-        where T : struct => value.HasValue ? Maybe.Some(value.Value) : Maybe.None;
+        where T : struct => value.HasValue ? Maybe.UnsafeSome(value.Value) : Maybe.None;
 
     [Pure]
     public static Maybe<string> ToMaybe(this string value, NoneWhen noneWhen)
     {
         return noneWhen switch
         {
-            NoneWhen.Null => value is null ? Maybe.None : Maybe.Some(value),
-            NoneWhen.NullOrEmpty => string.IsNullOrEmpty(value) ? Maybe.None : Maybe.Some(value),
-            NoneWhen.NullOrWhitespace => string.IsNullOrWhiteSpace(value) ? Maybe.None : Maybe.Some(value),
+            NoneWhen.Null => value is null ? Maybe.None : Maybe.UnsafeSome(value),
+            NoneWhen.NullOrEmpty => string.IsNullOrEmpty(value) ? Maybe.None : Maybe.UnsafeSome(value),
+            NoneWhen.NullOrWhitespace => string.IsNullOrWhiteSpace(value) ? Maybe.None : Maybe.UnsafeSome(value),
             _ => throw new ArgumentOutOfRangeException(nameof(noneWhen), noneWhen, null),
         };
     }
@@ -63,7 +63,7 @@ public static class MaybeExtensions
     {
         if (maybe.TryUnwrap(out var value) && other.TryUnwrap(out var otherValue))
         {
-            return Maybe.Some((value, otherValue));
+            return Maybe.UnsafeSome((value, otherValue));
         }
 
         return Maybe.None;
@@ -73,7 +73,7 @@ public static class MaybeExtensions
     {
         if (maybe.TryUnwrap(out var result))
         {
-            return (Maybe.Some(result.Item1), Maybe.Some(result.Item2));
+            return (Maybe.UnsafeSome(result.Item1), Maybe.UnsafeSome(result.Item2));
         }
 
         return (Maybe.None, Maybe.None);
