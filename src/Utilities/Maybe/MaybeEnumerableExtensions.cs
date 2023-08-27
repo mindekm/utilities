@@ -1,5 +1,7 @@
 namespace Utilities;
 
+using System.Diagnostics.CodeAnalysis;
+
 public static class MaybeEnumerableExtensions
 {
     /// <summary>
@@ -13,28 +15,13 @@ public static class MaybeEnumerableExtensions
     {
         Guard.NotNull(source);
 
-        switch (source)
+        if (source is IList<TSource> { Count: > 0 } list)
         {
-            case IList<TSource> list:
-                if (list.Count > 0)
-                {
-                    return Maybe.Some(list[0]);
-                }
-
-                break;
-            default:
-                using (var enumerator = source.GetEnumerator())
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        return Maybe.Some(enumerator.Current);
-                    }
-                }
-
-                break;
+            return Maybe.Some(list[0]);
         }
 
-        return Maybe.None;
+        using var enumerator = source.GetEnumerator();
+        return enumerator.MoveNext() ? Maybe.Some(enumerator.Current) : Maybe.None;
     }
 
     /// <summary>
@@ -73,33 +60,26 @@ public static class MaybeEnumerableExtensions
     {
         Guard.NotNull(source);
 
-        switch (source)
+        if (source is IList<TSource> list)
         {
-            case IList<TSource> list:
-                var count = list.Count;
-                if (count > 0)
-                {
-                    return Maybe.Some(list[count - 1]);
-                }
+            var count = list.Count;
+            if (count > 0)
+            {
+                return Maybe.Some(list[count - 1]);
+            }
+        }
 
-                break;
-            default:
-                using (var enumerator = source.GetEnumerator())
-                {
-                    if (enumerator.MoveNext())
-                    {
-                        Maybe<TSource> result;
-                        do
-                        {
-                            result = Maybe.Some(enumerator.Current);
-                        }
-                        while (enumerator.MoveNext());
+        using var enumerator = source.GetEnumerator();
+        if (enumerator.MoveNext())
+        {
+            TSource result;
+            do
+            {
+                result = enumerator.Current;
+            }
+            while (enumerator.MoveNext());
 
-                        return result;
-                    }
-                }
-
-                break;
+            return Maybe.Some(result);
         }
 
         return Maybe.None;
@@ -118,16 +98,38 @@ public static class MaybeEnumerableExtensions
         Guard.NotNull(source);
         Guard.NotNull(predicate);
 
-        Maybe<TSource> result = Maybe.None;
-        foreach (var element in source)
+        if (source is IList<TSource> list)
         {
-            if (predicate(element))
+            for (var i = list.Count - 1; i >= 0; i--)
             {
-                result = Maybe.Some(element);
+                var result = list[i];
+                if (predicate(result))
+                {
+                    return Maybe.Some(result);
+                }
             }
         }
 
-        return result;
+        using var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            var candidate = enumerator.Current;
+            if (predicate(candidate))
+            {
+                while (enumerator.MoveNext())
+                {
+                    var element = enumerator.Current;
+                    if (predicate(element))
+                    {
+                        candidate = element;
+                    }
+                }
+
+                return Maybe.Some(candidate);
+            }
+        }
+
+        return Maybe.None;
     }
 
     /// <summary>
@@ -142,35 +144,31 @@ public static class MaybeEnumerableExtensions
     {
         Guard.NotNull(source);
 
-        switch (source)
+        if (source is IList<TSource> list)
         {
-            case IList<TSource> list:
-                switch (list.Count)
-                {
-                    case 0: return Maybe.None;
-                    case 1: return Maybe.Some(list[0]);
-                }
-
-                break;
-            default:
-                using (var enumerable = source.GetEnumerator())
-                {
-                    if (!enumerable.MoveNext())
-                    {
-                        return Maybe.None;
-                    }
-
-                    var result = Maybe.Some(enumerable.Current);
-                    if (!enumerable.MoveNext())
-                    {
-                        return result;
-                    }
-                }
-
-                break;
+            switch (list.Count)
+            {
+                case 0:
+                    return Maybe.None;
+                case 1:
+                    return Maybe.Some(list[0]);
+            }
         }
 
-        throw new InvalidOperationException("Sequence contains more than one element.");
+        using var enumerator = source.GetEnumerator();
+        if (!enumerator.MoveNext())
+        {
+            return Maybe.None;
+        }
+
+        var result = enumerator.Current;
+        if (!enumerator.MoveNext())
+        {
+            return Maybe.Some(result);
+        }
+
+        ThrowMoreThanOneElementException();
+        return default; // Unreachable
     }
 
     /// <summary>
@@ -187,26 +185,25 @@ public static class MaybeEnumerableExtensions
         Guard.NotNull(source);
         Guard.NotNull(predicate);
 
-        Maybe<TSource> result = Maybe.None;
-        long count = 0;
-        foreach (var element in source)
+        using var enumerator = source.GetEnumerator();
+        while (enumerator.MoveNext())
         {
-            if (predicate(element))
+            var candidate = enumerator.Current;
+            if (predicate(candidate))
             {
-                result = Maybe.Some(element);
-                checked
+                while (enumerator.MoveNext())
                 {
-                    count++;
+                    if (predicate(enumerator.Current))
+                    {
+                        ThrowMoreThanOneMatchingElementException();
+                    }
                 }
+
+                return Maybe.Some(candidate);
             }
         }
 
-        return count switch
-        {
-            0 => Maybe.None,
-            1 => result,
-            _ => throw new InvalidOperationException("Sequence contains more than one matching element."),
-        };
+        return Maybe.None;
     }
 
     /// <summary>
@@ -221,32 +218,38 @@ public static class MaybeEnumerableExtensions
     {
         Guard.NotNull(source);
 
+        if (source is IList<TSource> list)
+        {
+            if (index >= 0 && index < list.Count)
+            {
+                return Maybe.Some(list[index]);
+            }
+
+            return Maybe.None;
+        }
+
         if (index >= 0)
         {
-            switch (source)
+            using var enumerator = source.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                case IList<TSource> list:
-                    if (index < list.Count)
-                    {
-                        return Maybe.Some(list[index]);
-                    }
+                if (index == 0)
+                {
+                    return Maybe.Some(enumerator.Current);
+                }
 
-                    break;
-                default:
-                    foreach (var item in source)
-                    {
-                        if (index == 0)
-                        {
-                            return Maybe.Some(item);
-                        }
-
-                        index--;
-                    }
-
-                    break;
+                index--;
             }
         }
 
         return Maybe.None;
     }
+
+    [DoesNotReturn]
+    private static void ThrowMoreThanOneElementException()
+        => throw new InvalidOperationException("Sequence contains more than one element.");
+
+    [DoesNotReturn]
+    private static void ThrowMoreThanOneMatchingElementException()
+        => throw new InvalidOperationException("Sequence contains more than one matching element.");
 }
