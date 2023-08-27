@@ -100,16 +100,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         return IsSome ? value : valueFactory();
     }
 
-    public bool Equals(Maybe<T> other)
-    {
-        if (IsNone && other.IsNone)
-        {
-            return true;
-        }
-
-        return IsSome && other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
-    }
-
     [Pure]
     public TOut? Match<TOut>(Func<T, TOut?> onSome, Func<TOut?> onNone)
     {
@@ -320,6 +310,16 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
         {
             yield return value;
         }
+    }
+
+    public bool Equals(Maybe<T> other)
+    {
+        if (IsNone && other.IsNone)
+        {
+            return true;
+        }
+
+        return IsSome && other.IsSome && EqualityComparer<T>.Default.Equals(value, other.value);
     }
 
     public override bool Equals(object? obj) => obj is Maybe<T> other && Equals(other);
