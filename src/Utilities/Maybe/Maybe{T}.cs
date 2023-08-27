@@ -7,7 +7,7 @@ using System.Diagnostics.Contracts;
 
 [DebuggerDisplay("{DebuggerDisplay,nq}")]
 [DebuggerTypeProxy(typeof(Maybe<>.DebuggerProxy))]
-public readonly struct Maybe<T> : IEquatable<Maybe<T>>
+public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, IComparable
 {
     private readonly T? value;
 
@@ -32,6 +32,14 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     public static bool operator ==(Maybe<T> left, Maybe<T> right) => left.Equals(right);
 
     public static bool operator !=(Maybe<T> left, Maybe<T> right) => !left.Equals(right);
+
+    public static bool operator <(Maybe<T> left, Maybe<T> right) => left.CompareTo(right) < 0;
+
+    public static bool operator >(Maybe<T> left, Maybe<T> right) => left.CompareTo(right) > 0;
+
+    public static bool operator <=(Maybe<T> left, Maybe<T> right) => left.CompareTo(right) <= 0;
+
+    public static bool operator >=(Maybe<T> left, Maybe<T> right) => left.CompareTo(right) >= 0;
 
     [Pure]
     public T Expect(string message)
@@ -423,6 +431,32 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     public override int GetHashCode() => IsSome ? EqualityComparer<T>.Default.GetHashCode(value) : 0;
 
+    public int CompareTo(Maybe<T> other)
+    {
+        if (IsSome && other.IsNone)
+        {
+            return 1;
+        }
+
+        if (IsNone && other.IsSome)
+        {
+            return -1;
+        }
+
+        return Comparer<T>.Default.Compare(value, other.value);
+    }
+
+    public int CompareTo(object? obj)
+    {
+        if (obj is Maybe<T> other)
+        {
+            return CompareTo(other);
+        }
+
+        ThrowInvalidComparisonException();
+        return 0; // Unreachable
+    }
+
     public override string ToString() => IsSome ? $"Some<{typeof(T).Name}>: {value}" : $"None<{typeof(T).Name}>";
 
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -431,6 +465,10 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     [DoesNotReturn]
     private static void ThrowInvalidUnwrapException(string message)
         => throw new InvalidOperationException(message);
+
+    [DoesNotReturn]
+    private static void ThrowInvalidComparisonException()
+        => throw new ArgumentException("Object must be of type Maybe<T>");
 
     private sealed class DebuggerProxy
     {
