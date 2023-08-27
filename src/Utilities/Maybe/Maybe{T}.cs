@@ -36,7 +36,16 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     public static bool operator !=(Maybe<T> left, Maybe<T> right) => !left.Equals(right);
 
     [Pure]
-    public T Expect(string message) => IsSome ? value : throw new InvalidOperationException(message);
+    public T Expect(string message)
+    {
+        if (IsSome)
+        {
+            return value;
+        }
+
+        ThrowInvalidUnwrapException(message);
+        return default; // Unreachable
+    }
 
     [Pure]
     public bool IsSomeAnd(Func<T, bool> predicate)
@@ -54,7 +63,8 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
             return value;
         }
 
-        throw new InvalidOperationException($"Cannot unwrap None<{typeof(T).Name}>.");
+        ThrowInvalidUnwrapException($"Cannot unwrap None<{typeof(T).Name}>.");
+        return default; // Unreachable
     }
 
     public bool TryUnwrap([MaybeNullWhen(false)] out T result)
@@ -322,6 +332,10 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public void Deconstruct(out bool isSome, out T? wrappedValue) => (isSome, wrappedValue) = (IsSome, value);
+
+    [DoesNotReturn]
+    private static void ThrowInvalidUnwrapException(string message)
+        => throw new InvalidOperationException(message);
 
     private sealed class DebuggerProxy
     {
