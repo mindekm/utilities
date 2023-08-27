@@ -1,9 +1,12 @@
 namespace Utilities;
 
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
+[DebuggerTypeProxy(typeof(Maybe<>.DebuggerProxy))]
 public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 {
     private readonly T? value;
@@ -21,6 +24,10 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     [MemberNotNullWhen(false, nameof(value))]
     public bool IsNone => !IsSome;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    private string DebuggerDisplay => ToString();
 
     public static implicit operator Maybe<T>(NoneOption none) => default;
 
@@ -315,4 +322,18 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public void Deconstruct(out bool isSome, out T? wrappedValue) => (isSome, wrappedValue) = (IsSome, value);
+
+    private sealed class DebuggerProxy
+    {
+        private readonly Maybe<T> maybe;
+
+        public DebuggerProxy(Maybe<T> maybe)
+        {
+            this.maybe = maybe;
+        }
+
+        public bool IsSome => maybe.IsSome;
+
+        public T? Value => maybe.value;
+    }
 }
