@@ -13,7 +13,7 @@ public static class MaybeExtensions
         where T : struct => value.HasValue ? Maybe.UnsafeSome(value.Value) : Maybe.None;
 
     [Pure]
-    public static Maybe<string> ToMaybe(this string value, NoneWhen noneWhen)
+    public static Maybe<string> ToMaybe(this string? value, NoneWhen noneWhen)
     {
         return noneWhen switch
         {
