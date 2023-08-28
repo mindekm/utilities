@@ -99,15 +99,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, I
     [Pure]
     public T? UnwrapOr(T? alternative) => IsSome ? value : alternative;
 
-    [Obsolete("Causes overload collisions. To be removed. Use UnwrapOrElse.")]
-    [Pure]
-    public T? UnwrapOr(Func<T?> valueFactory)
-    {
-        Guard.NotNull(valueFactory);
-
-        return IsSome ? value : valueFactory();
-    }
-
     [Pure]
     public T? UnwrapOrElse(Func<T?> valueFactory)
     {
@@ -287,40 +278,6 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, I
         Guard.NotNull(valueFactory);
 
         return IsSome ? binder(value, state) : valueFactory(state);
-    }
-
-    [Obsolete("To be removed. Use BindOrElse().")]
-    public Maybe<TOut> BindOr<TOut>(Func<T, Maybe<TOut>> binder, Func<Maybe<TOut>> valueFactory)
-    {
-        Guard.NotNull(binder);
-        Guard.NotNull(valueFactory);
-
-        return IsSome ? binder(value) : valueFactory();
-    }
-
-    [Obsolete("To be removed. Use BindOr().")]
-    public Maybe<TOut> Bind<TOut>(Func<T, Maybe<TOut>> someBinder, Func<Maybe<TOut>> noneBinder)
-    {
-        Guard.NotNull(someBinder);
-        Guard.NotNull(noneBinder);
-
-        return IsSome ? someBinder(value) : noneBinder();
-    }
-
-    [Obsolete("To be removed. Use Bind().")]
-    public Maybe<TOut> BindOnSome<TOut>(Func<T, Maybe<TOut>> binder)
-    {
-        Guard.NotNull(binder);
-
-        return IsSome ? binder(value) : Maybe.None;
-    }
-
-    [Obsolete("To be removed.")]
-    public Maybe<T> BindOnNone(Func<Maybe<T>> binder)
-    {
-        Guard.NotNull(binder);
-
-        return IsNone ? binder() : this;
     }
 
     [Pure]
