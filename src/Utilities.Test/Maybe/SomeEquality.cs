@@ -1,4 +1,4 @@
-﻿namespace Utilities.Test.Maybe;
+namespace Utilities.Test.Maybe;
 
 using System.Text;
 using Utilities;

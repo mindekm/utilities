@@ -397,4 +397,64 @@ public class MaybeTestSuite
 
         result.IsNone.ShouldBeTrue();
     }
+
+    [Fact]
+    public void Maybe_AsEnumerable_ShouldReturnOneElementForSome()
+    {
+        var some = Maybe.Some(fixture.Create<string>());
+
+        some.AsEnumerable().Count().ShouldBe(1);
+    }
+
+    [Fact]
+    public void Maybe_AsEnumerable_ShouldReturnNoElementsForNone()
+    {
+        Maybe<string> none = Maybe.None;
+
+        none.AsEnumerable().Count().ShouldBe(0);
+    }
+
+    [Fact]
+    public void Maybe_BindOrElse_ShouldApplyBinderOnSome()
+    {
+        var some = Maybe.Some(10);
+
+        var result = some.BindOrElse(v => Maybe.Some(v + 5), () => Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(15);
+    }
+
+    [Fact]
+    public void Maybe_BindOrElse_ShouldUseValueFactoryOnNone()
+    {
+        Maybe<int> none = Maybe.None;
+
+        var result = none.BindOrElse(_ => Maybe.Some(10), () => Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(20);
+    }
+
+    [Fact]
+    public void Maybe_BindOr_ShouldApplyBinderOnSome()
+    {
+        var some = Maybe.Some(10);
+
+        var result = some.BindOr(v => Maybe.Some(v + 5), Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(15);
+    }
+
+    [Fact]
+    public void Maybe_BindOr_ShouldUseAlternativeOnNone()
+    {
+        Maybe<int> none = Maybe.None;
+
+        var result = none.BindOr(_ => Maybe.Some(10), Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(20);
+    }
 }
