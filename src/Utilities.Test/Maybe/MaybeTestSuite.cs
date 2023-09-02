@@ -397,4 +397,154 @@ public class MaybeTestSuite
 
         result.IsNone.ShouldBeTrue();
     }
+
+    [Fact]
+    public void Maybe_AsEnumerable_ShouldReturnOneElementForSome()
+    {
+        var some = Maybe.Some(fixture.Create<string>());
+
+        some.AsEnumerable().Count().ShouldBe(1);
+    }
+
+    [Fact]
+    public void Maybe_AsEnumerable_ShouldReturnNoElementsForNone()
+    {
+        Maybe<string> none = Maybe.None;
+
+        none.AsEnumerable().Count().ShouldBe(0);
+    }
+
+    [Fact]
+    public void Maybe_BindOrElse_ShouldApplyBinderOnSome()
+    {
+        var some = Maybe.Some(10);
+
+        var result = some.BindOrElse(v => Maybe.Some(v + 5), () => Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(15);
+    }
+
+    [Fact]
+    public void Maybe_BindOrElse_ShouldUseValueFactoryOnNone()
+    {
+        Maybe<int> none = Maybe.None;
+
+        var result = none.BindOrElse(_ => Maybe.Some(10), () => Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(20);
+    }
+
+    [Fact]
+    public void Maybe_BindOr_ShouldApplyBinderOnSome()
+    {
+        var some = Maybe.Some(10);
+
+        var result = some.BindOr(v => Maybe.Some(v + 5), Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(15);
+    }
+
+    [Fact]
+    public void Maybe_BindOr_ShouldUseAlternativeOnNone()
+    {
+        Maybe<int> none = Maybe.None;
+
+        var result = none.BindOr(_ => Maybe.Some(10), Maybe.Some(20));
+
+        result.IsSome.ShouldBeTrue();
+        result.Unwrap().ShouldBe(20);
+    }
+
+    [Fact]
+    public void Maybe_Match_ShouldExecuteOnSomeDelegateWhenSome()
+    {
+        var some = Maybe.Some(10);
+
+        var result = some.Match(v => v + 5, () => 100);
+
+        result.ShouldBe(15);
+    }
+
+    [Fact]
+    public void Maybe_Match_ShouldExecuteOnNoneDelegateWhenNone()
+    {
+        Maybe<int> none = Maybe.None;
+
+        var result = none.Match(v => v + 5, () => 100);
+
+        result.ShouldBe(100);
+    }
+
+    [Fact]
+    public void Maybe_Do_ShouldExecuteOnSomeDelegateWhenSome()
+    {
+        var some = Maybe.Some(10);
+        var isSomeExecuted = false;
+        var isNoneExecuted = false;
+
+        some.Do(() => isSomeExecuted = true, () => isNoneExecuted = true);
+
+        isSomeExecuted.ShouldBeTrue();
+        isNoneExecuted.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Maybe_Do_ShouldExecuteOnNoneDelegateWhenNone()
+    {
+        Maybe<int> none = Maybe.None;
+        var isSomeExecuted = false;
+        var isNoneExecuted = false;
+
+        none.Do(() => isSomeExecuted = true, () => isNoneExecuted = true);
+
+        isSomeExecuted.ShouldBeFalse();
+        isNoneExecuted.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_DoOnSome_ShouldExecuteDelegateWhenSome()
+    {
+        var some = Maybe.Some(10);
+        var isExecuted = false;
+
+        some.DoOnSome(() => isExecuted = true);
+
+        isExecuted.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_DoOnSome_ShouldNotExecuteDelegateWhenNone()
+    {
+        Maybe<int> none = Maybe.None;
+        var isExecuted = false;
+
+        none.DoOnSome(() => isExecuted = true);
+
+        isExecuted.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Maybe_DoOnNone_ShouldExecuteDelegateWhenNone()
+    {
+        Maybe<int> none = Maybe.None;
+        var isExecuted = false;
+
+        none.DoOnNone(() => isExecuted = true);
+
+        isExecuted.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Maybe_DoOnNone_ShouldNotExecuteDelegateWhenSome()
+    {
+        var some = Maybe.Some(10);
+        var isExecuted = false;
+
+        some.DoOnNone(() => isExecuted = true);
+
+        isExecuted.ShouldBeFalse();
+    }
 }
