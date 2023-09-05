@@ -54,6 +54,34 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, I
     }
 
     [Pure]
+    public T Expect<TException>(Func<TException> exceptionFactory)
+        where TException : Exception
+    {
+        Guard.NotNull(exceptionFactory);
+
+        if (IsSome)
+        {
+            return value;
+        }
+
+        throw exceptionFactory();
+    }
+
+    [Pure]
+    public T Expect<TException, TState>(TState state, Func<TState, TException> exceptionFactory)
+        where TException : Exception
+    {
+        Guard.NotNull(exceptionFactory);
+
+        if (IsSome)
+        {
+            return value;
+        }
+
+        throw exceptionFactory(state);
+    }
+
+    [Pure]
     public bool IsSomeAnd(Func<T, bool> predicate)
     {
         Guard.NotNull(predicate);
@@ -269,6 +297,15 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, I
         Guard.NotNull(valueFactory);
 
         return IsSome ? binder(value, state) : valueFactory();
+    }
+
+    [Pure]
+    public Maybe<TOut> BindOrElse<TOut, TState>(TState state, Func<T, Maybe<TOut>> binder, Func<TState, Maybe<TOut>> valueFactory)
+    {
+        Guard.NotNull(binder);
+        Guard.NotNull(valueFactory);
+
+        return IsSome ? binder(value) : valueFactory(state);
     }
 
     [Pure]
