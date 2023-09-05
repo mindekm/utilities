@@ -78,4 +78,24 @@ public static class MaybeExtensions
 
         return (Maybe.None, Maybe.None);
     }
+
+    public static void Push<T>(this Stack<T> stack, Maybe<T> value)
+    {
+        Guard.NotNull(stack);
+
+        if (value.TryUnwrap(out var result))
+        {
+            stack.Push(result);
+        }
+    }
+
+    public static void Enqueue<T>(this Queue<T> queue, Maybe<T> value)
+    {
+        Guard.NotNull(queue);
+
+        if (value.TryUnwrap(out var result))
+        {
+            queue.Enqueue(result);
+        }
+    }
 }
