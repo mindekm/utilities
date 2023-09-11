@@ -403,6 +403,20 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>, IComparable<Maybe<T>>, I
         return Maybe.None;
     }
 
+    [Pure]
+    public Maybe<TOut> As<TOut>()
+    {
+        if (IsSome)
+        {
+            if (value is TOut result)
+            {
+                return Maybe.UnsafeSome(result);
+            }
+        }
+
+        return Maybe.None;
+    }
+
     public IEnumerable<T> AsEnumerable()
     {
         if (IsSome)
