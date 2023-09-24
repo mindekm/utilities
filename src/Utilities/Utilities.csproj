@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
     <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
