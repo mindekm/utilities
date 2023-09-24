@@ -61,6 +61,7 @@ MemberNotNullWhenAttribute.cs
 NotNullAttribute.cs
 NotNullIfNotNullAttribute.cs
 NotNullWhenAttribute.cs
+ValueStopwatch.cs
 ```
 
 The MIT License (MIT)
