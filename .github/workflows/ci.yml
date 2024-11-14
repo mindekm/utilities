@@ -1,30 +1,44 @@
-name: Build & Run Tests
+name: Continuous Integration
 
 on:
-  push:
-    branches: [ development ]
   pull_request:
     branches: [ development ]
 
+env:
+  DOTNET_NOTLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+  ci:
+    name: Compile and run tests
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+
     - name: Setup dotnet
       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # 4.1.0
       with:
         global-json-file: ./src/global.json
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
 
-defaults:
-  run:
-    working-directory: ./src
+    - name: Restore
+      working-directory: ./src
+      run: dotnet restore
+
+    - name: Build
+      working-directory: ./src
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Test
+      working-directory: ./src
+      run: dotnet test --configuration Release --no-restore --logger trx
+
+    - name: Publish results
+      uses: EnricoMi/publish-unit-test-result-action@170bf24d20d201b842d7a52403b73ed297e6645b # 2.18.0
+      if: always()
+      with:
+        files: |
+          **/*.trx
