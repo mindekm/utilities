@@ -17,7 +17,7 @@ jobs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # 4.1.0
       with:
-        global-json-file: global.json
+        global-json-file: ./global.json
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
