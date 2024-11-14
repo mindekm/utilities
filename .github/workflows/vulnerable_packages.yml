@@ -1,0 +1,41 @@
+﻿name: Scan - Vulnerable packages
+
+on:
+  pull_request:
+    branches: [ development ]
+  schedule:
+    - cron: '0 0 * * *'
+
+env:
+  DOTNET_NOTLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  vulnerable_packages:
+    name: Scan for vulnerable packages
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25 # 4.1.0
+      with:
+        global-json-file: ./src/global.json
+
+    - name: Restore
+      working-directory: ./src
+      run: dotnet restore
+
+    - name: List packages
+      working-directory: ./src
+      run: |
+        set -e
+        OUTPUT=$(dotnet list package --vulnerable --include-transitive)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q 'Severity'; then
+          echo "Vulnerable packages found"
+          exit 1
+        else
+          echo "No vulnerable packages found"
+        fi
