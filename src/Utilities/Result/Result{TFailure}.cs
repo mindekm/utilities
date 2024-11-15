@@ -26,9 +26,13 @@ public class Result<TFailure>
     [MemberNotNullWhen(true, nameof(failureReason))]
     public bool IsFailure => !IsSuccess;
 
+#pragma warning disable CA1000
     public static Result<TFailure> Success() => new Result<TFailure>();
+#pragma warning restore CA1000
 
+#pragma warning disable CA1000
     public static Result<TFailure> Failure(TFailure failureReason) => new Result<TFailure>(failureReason);
+#pragma warning restore CA1000
 
     [Pure]
     [DebuggerStepThrough]

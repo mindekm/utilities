@@ -30,10 +30,14 @@ public class Result<TPayload, TFailure>
     [MemberNotNullWhen(true, nameof(failureReason))]
     public bool IsFailure => !IsSuccess;
 
+#pragma warning disable CA1000
     public static Result<TPayload, TFailure> Success(TPayload payloadValue)
+#pragma warning restore CA1000
         => new Result<TPayload, TFailure>(payloadValue);
 
+#pragma warning disable CA1000
     public static Result<TPayload, TFailure> Failure(TFailure failureReason)
+#pragma warning restore CA1000
         => new Result<TPayload, TFailure>(failureReason);
 
     [Pure]
