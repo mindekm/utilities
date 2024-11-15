@@ -59,7 +59,9 @@ public static class MaybeExtensions
         return collection;
     }
 
+#pragma warning disable SA1414
     public static Maybe<(T, TU)> Zip<T, TU>(this Maybe<T> maybe, Maybe<TU> other)
+#pragma warning restore SA1414
     {
         if (maybe.TryUnwrap(out var value) && other.TryUnwrap(out var otherValue))
         {
@@ -69,7 +71,9 @@ public static class MaybeExtensions
         return Maybe.None;
     }
 
+#pragma warning disable SA1414
     public static (Maybe<T>, Maybe<TU>) Unzip<T, TU>(this Maybe<(T, TU)> maybe)
+#pragma warning restore SA1414
     {
         if (maybe.TryUnwrap(out var result))
         {
