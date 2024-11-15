@@ -65,7 +65,7 @@ public class EnumerableExtensionsTestSuite
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
-        var maybe = list.FirstOrNone(e => e.StartsWith("Test2"));
+        var maybe = list.FirstOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal));
         maybe.IsSome.ShouldBeTrue();
         maybe.Unwrap().ShouldBe("Test2");
     }
@@ -97,7 +97,7 @@ public class EnumerableExtensionsTestSuite
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
-        var maybe = list.LastOrNone(e => e.StartsWith("Test2"));
+        var maybe = list.LastOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal));
         maybe.IsSome.ShouldBeTrue();
         maybe.Unwrap().ShouldBe("Test22");
     }
@@ -136,7 +136,7 @@ public class EnumerableExtensionsTestSuite
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
-        var maybe = list.SingleOrNone(e => e.StartsWith("Test3"));
+        var maybe = list.SingleOrNone(e => e.StartsWith("Test3", StringComparison.Ordinal));
         maybe.IsSome.ShouldBeTrue();
         maybe.Unwrap().ShouldBe("Test3");
     }
@@ -154,7 +154,7 @@ public class EnumerableExtensionsTestSuite
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
-        Should.Throw<InvalidOperationException>(() => list.SingleOrNone(e => e.StartsWith("Test2")));
+        Should.Throw<InvalidOperationException>(() => list.SingleOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal)));
     }
 
     [Theory]
