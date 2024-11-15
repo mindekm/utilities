@@ -7,6 +7,10 @@
     <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
   <PropertyGroup>
     <PackageId>MM.Utilities</PackageId>
     <Title>MM.Utilities</Title>
