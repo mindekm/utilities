@@ -11,7 +11,7 @@ using BenchmarkDotNet.Reports;
 [HideColumns(Column.RatioSD)]
 public class StateBenchmark
 {
-    private class Config : ManualConfig
+    private sealed class Config : ManualConfig
     {
         public Config()
         {

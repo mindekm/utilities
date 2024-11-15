@@ -12,7 +12,7 @@ public class GuardNotNullGenericsBenchmark
     public string Generic()
     {
         var input = Guid.NewGuid().ToString();
-        
+
         Guard.NotNullGeneric(input);
 
         return input;
@@ -22,13 +22,13 @@ public class GuardNotNullGenericsBenchmark
     public string NonGeneric()
     {
         var input = Guid.NewGuid().ToString();
-        
+
         Guard.NotNull(input);
 
         return input;
     }
 
-    private class Guard
+    private sealed class Guard
     {
         public static void NotNullGeneric<T>(T parameter, [CallerArgumentExpression("parameter")] string parameterName = default)
             where T : class

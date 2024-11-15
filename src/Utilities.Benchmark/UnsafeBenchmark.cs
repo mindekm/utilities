@@ -12,7 +12,7 @@ namespace Utilities.Benchmark;
 [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
 public class UnsafeBenchmark
 {
-    private class Config : ManualConfig
+    private sealed class Config : ManualConfig
     {
         public Config()
         {
