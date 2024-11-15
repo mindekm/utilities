@@ -316,6 +316,6 @@ public readonly struct Either<TLeft, TRight> : IEquatable<Either<TLeft, TRight>>
     public void Deconstruct(out bool isLeft, out TLeft? left, out bool isRight, out TRight? right)
         => (isLeft, left, isRight, right) = (IsLeft, leftValue, IsRight, rightValue);
 
-    private static Exception UninitializedException() =>
+    private static InvalidOperationException UninitializedException() =>
         new InvalidOperationException($"Either<{typeof(TLeft).Name}, {typeof(TRight).Name}> is uninitialized.");
 }
