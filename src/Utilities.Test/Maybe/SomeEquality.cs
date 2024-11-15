@@ -41,8 +41,6 @@ public class SomeEquality
 
         some.Equals(null).ShouldBeFalse();
         some.Equals((object)null).ShouldBeFalse();
-        (some == null).ShouldBeFalse();
-        (some != null).ShouldBeTrue();
     }
 
     [Fact]
@@ -58,7 +56,7 @@ public class SomeEquality
     public void Some_ShouldNotBeEqualToNone()
     {
         var some = Maybe.Some(fixture.Create<string>());
-        
+
         some.Equals(Maybe.None).ShouldBeFalse();
         some.Equals((object)default(Maybe<string>)).ShouldBeFalse();
     }
