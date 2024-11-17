@@ -1,77 +1,93 @@
 ﻿namespace Utilities.Test.Either;
 
-using Shouldly;
-using Xunit;
 using Either = Utilities.Either;
 
 public class Deconstruction
 {
-    [Fact]
-    public void Either_DeconstructBasic_ShouldCorrectlyDeconstructLeftCase()
+    [Test]
+    public async ValueTask Either_DeconstructBasic_ShouldCorrectlyDeconstructLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
         var (isLeft, isRight) = either;
 
-        isLeft.ShouldBeTrue();
-        isRight.ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsTrue();
+            await Assert.That(isRight).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Either_DeconstructBasic_ShouldCorrectlyDeconstructRightCase()
+    [Test]
+    public async ValueTask Either_DeconstructBasic_ShouldCorrectlyDeconstructRightCase()
     {
         Either<string, string> either = Either.Right("right value");
         var (isLeft, isRight) = either;
 
-        isLeft.ShouldBeFalse();
-        isRight.ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsFalse();
+            await Assert.That(isRight).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Either_DeconstructBasic_ShouldCorrectlyDeconstructUninitializedCase()
+    [Test]
+    public async ValueTask Either_DeconstructBasic_ShouldCorrectlyDeconstructUninitializedCase()
     {
         Either<string, string> either = default;
         var (isLeft, isRight) = either;
 
-        isLeft.ShouldBeFalse();
-        isRight.ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsFalse();
+            await Assert.That(isRight).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Either_Deconstruct_ShouldCorrectlyDeconstructLeftCase()
+    [Test]
+    public async ValueTask Either_Deconstruct_ShouldCorrectlyDeconstructLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
         var (isLeft, left, isRight, right) = either;
 
-        isLeft.ShouldBeTrue();
-        left.ShouldBe("left value");
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsTrue();
+            await Assert.That(left).IsEqualTo("left value");
 
-        isRight.ShouldBeFalse();
-        right.ShouldBe(default);
+            await Assert.That(isRight).IsFalse();
+            await Assert.That(right).IsDefault();
+        }
     }
 
-    [Fact]
-    public void Either_Deconstruct_ShouldCorrectlyDeconstructRightCase()
+    [Test]
+    public async ValueTask Either_Deconstruct_ShouldCorrectlyDeconstructRightCase()
     {
         Either<int, string> either = Either.Right("right value");
         var (isLeft, left, isRight, right) = either;
 
-        isLeft.ShouldBeFalse();
-        left.ShouldBe(default);
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsFalse();
+            await Assert.That(left).IsDefault();
 
-        isRight.ShouldBeTrue();
-        right.ShouldBe("right value");
+            await Assert.That(isRight).IsTrue();
+            await Assert.That(right).IsEqualTo("right value");
+        }
     }
 
-    [Fact]
-    public void Either_Deconstruct_ShouldCorrectlyDeconstructUninitializedCase()
+    [Test]
+    public async ValueTask Either_Deconstruct_ShouldCorrectlyDeconstructUninitializedCase()
     {
         Either<int, string> either = default;
         var (isLeft, left, isRight, right) = either;
 
-        isLeft.ShouldBeFalse();
-        left.ShouldBe(default);
+        using (Assert.Multiple())
+        {
+            await Assert.That(isLeft).IsFalse();
+            await Assert.That(left).IsDefault();
 
-        isRight.ShouldBeFalse();
-        right.ShouldBeNull();
+            await Assert.That(isRight).IsFalse();
+            await Assert.That(right).IsNull();
+        }
     }
 }

@@ -1,54 +1,61 @@
 ﻿namespace Utilities.Test.Either;
 
-using Shouldly;
-using Xunit;
 using Either = Utilities.Either;
 
 public class Equality
 {
-    [Fact]
-    public void Either_LeftCaseShouldBeEqualToItsCopy()
+    [Test]
+    public async ValueTask Either_LeftCaseShouldBeEqualToItsCopy()
     {
         Either<string, string> either = Either.Left("left value");
         Either<string, string> copy = Either.Left("left value");
 
-        either.Equals(copy).ShouldBeTrue();
-        (either == copy).ShouldBeTrue();
-        either.Equals((object)copy).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.Equals(copy)).IsTrue();
+            await Assert.That(either == copy).IsTrue();
+            await Assert.That(either.Equals((object)copy)).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Either_RightCaseShouldBeEqualToItsCopy()
+    [Test]
+    public async ValueTask Either_RightCaseShouldBeEqualToItsCopy()
     {
         Either<string, string> either = Either.Right("right value");
         Either<string, string> copy = Either.Right("right value");
 
-        either.Equals(copy).ShouldBeTrue();
-        (either == copy).ShouldBeTrue();
-        either.Equals((object)copy).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.Equals(copy)).IsTrue();
+            await Assert.That(either == copy).IsTrue();
+            await Assert.That(either.Equals((object)copy)).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Either_LeftCaseShouldNotBeEqualToRightCase()
+    [Test]
+    public async ValueTask Either_LeftCaseShouldNotBeEqualToRightCase()
     {
         Either<string, string> left = Either.Left("value");
         Either<string, string> right = Either.Right("value");
 
-        left.Equals(right).ShouldBeFalse();
-        (left != right).ShouldBeTrue();
-        left.Equals((object)right).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(left.Equals(right)).IsFalse();
+            await Assert.That(left != right).IsTrue();
+            await Assert.That(left.Equals((object)right)).IsFalse();
 
-        right.Equals(left).ShouldBeFalse();
-        (right != left).ShouldBeTrue();
-        right.Equals((object)left).ShouldBeFalse();
+            await Assert.That(right.Equals(left)).IsFalse();
+            await Assert.That(right != left).IsTrue();
+            await Assert.That(right.Equals((object)left)).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Either_GetHashCode_ShouldNotHaveACollisionBetweenLeftAndRightStates()
+    [Test]
+    public async ValueTask Either_GetHashCode_ShouldNotHaveACollisionBetweenLeftAndRightStates()
     {
         Either<string, string> left = Either.Left("value");
         Either<string, string> right = Either.Right("value");
-        
-        left.GetHashCode().ShouldNotBe(right.GetHashCode());
+
+        await Assert.That(left.GetHashCode()).IsNotEqualTo(right.GetHashCode());
     }
 }

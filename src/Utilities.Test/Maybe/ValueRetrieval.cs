@@ -2,92 +2,96 @@ namespace Utilities.Test.Maybe;
 
 using System;
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class ValueRetrieval
 {
-    [Fact]
-    public void Maybe_TryUnwrap_ShouldReturnTrueForSome()
+    [Test]
+    public async ValueTask Maybe_TryUnwrap_ShouldReturnTrueForSome()
     {
         const string Expected = "Test";
 
-        Maybe.Some(Expected).TryUnwrap(out var result).ShouldBeTrue();
-        result.ShouldBe(Expected);
+        using (Assert.Multiple())
+        {
+            await Assert.That(Maybe.Some(Expected).TryUnwrap(out var result)).IsTrue();
+            await Assert.That(result).IsEqualTo(Expected);
+        }
     }
 
-    [Fact]
-    public void Maybe_TryUnwrap_ShouldReturnFalseForNone()
+    [Test]
+    public async ValueTask Maybe_TryUnwrap_ShouldReturnFalseForNone()
     {
-        default(Maybe<string>).TryUnwrap(out var result).ShouldBeFalse();
-        result.ShouldBe(default);
+        using (Assert.Multiple())
+        {
+            await Assert.That(default(Maybe<string>).TryUnwrap(out var result)).IsFalse();
+            await Assert.That(result).IsDefault();
+        }
     }
 
-    [Fact]
-    public void Maybe_Unwrap_ShouldThrowForNone()
+    [Test]
+    public async ValueTask Maybe_Unwrap_ShouldThrowForNone()
     {
-        Should.Throw<InvalidOperationException>(() => default(Maybe<string>).Unwrap());
+        await Assert.That(() => default(Maybe<string>).Unwrap()).Throws<InvalidOperationException>();
     }
 
-    [Fact]
-    public void Maybe_Unwrap_ShouldReturnValueForSome()
-    {
-        const string expected = "Test";
-
-        Maybe.Some(expected).Unwrap().ShouldBe(expected);
-    }
-
-    [Fact]
-    public void Maybe_UnwrapOrDefault_ShouldReturnValueForSome()
+    [Test]
+    public async ValueTask Maybe_Unwrap_ShouldReturnValueForSome()
     {
         const string expected = "Test";
 
-        Maybe.Some(expected).UnwrapOrDefault().ShouldBe(expected);
+        await Assert.That(Maybe.Some(expected).Unwrap()).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void Maybe_UnwrapOrDefault_ShouldReturnDefaultForNone()
+    [Test]
+    public async ValueTask Maybe_UnwrapOrDefault_ShouldReturnValueForSome()
     {
-        default(Maybe<string>).UnwrapOrDefault().ShouldBe(default);
+        const string expected = "Test";
+
+        await Assert.That(Maybe.Some(expected).UnwrapOrDefault()).IsEqualTo(expected);
     }
 
-    [Fact]
-    public void Maybe_UnwrapOrElse_ShouldReturnValueForSome()
+    [Test]
+    public async ValueTask Maybe_UnwrapOrDefault_ShouldReturnDefaultForNone()
+    {
+        await Assert.That(default(Maybe<string>).UnwrapOrDefault()).IsDefault();
+    }
+
+    [Test]
+    public async ValueTask Maybe_UnwrapOrElse_ShouldReturnValueForSome()
     {
         var some = Maybe.Some(10);
 
         var result = some.UnwrapOrElse(() => 20);
 
-        result.ShouldBe(10);
+        await Assert.That(result).IsEqualTo(10);
     }
 
-    [Fact]
-    public void Maybe_UnwrapOrElse_ShouldUseValueFactoryForNone()
+    [Test]
+    public async ValueTask Maybe_UnwrapOrElse_ShouldUseValueFactoryForNone()
     {
         Maybe<int> none = Maybe.None;
 
         var result = none.UnwrapOrElse(() => 20);
 
-        result.ShouldBe(20);
+        await Assert.That(result).IsEqualTo(20);
     }
 
-    [Fact]
-    public void Maybe_UnwrapOr_ShouldReturnValueOnSome()
+    [Test]
+    public async ValueTask Maybe_UnwrapOr_ShouldReturnValueOnSome()
     {
         var some = Maybe.Some(10);
 
         var result = some.UnwrapOr(20);
 
-        result.ShouldBe(10);
+        await Assert.That(result).IsEqualTo(10);
     }
 
-    [Fact]
-    public void Maybe_UnwrapOr_ShouldUseAlternativeOnNone()
+    [Test]
+    public async ValueTask Maybe_UnwrapOr_ShouldUseAlternativeOnNone()
     {
         Maybe<int> none = Maybe.None;
 
         var result = none.UnwrapOr(20);
 
-        result.ShouldBe(20);
+        await Assert.That(result).IsEqualTo(20);
     }
 }

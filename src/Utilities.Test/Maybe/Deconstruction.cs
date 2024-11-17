@@ -1,31 +1,35 @@
 ﻿namespace Utilities.Test.Maybe;
 
-using Shouldly;
-using Xunit;
-using Maybe = Utilities.Maybe;
+using Utilities;
 
 public class Deconstruction
 {
-    [Fact]
-    public void Maybe_Deconstruct_ShouldCorrectlyDeconstructNone()
+    [Test]
+    public async ValueTask Maybe_Deconstruct_ShouldCorrectlyDeconstructNone()
     {
         Maybe<string> none = Maybe.None;
 
         var (isSome, value) = none;
 
-        isSome.ShouldBeFalse();
-        value.ShouldBeNull();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isSome).IsFalse();
+            await Assert.That(value).IsNull();
+        }
     }
 
-    [Fact]
-    public void Maybe_Deconstruct_ShouldCorrectlyDeconstructSome()
+    [Test]
+    public async ValueTask Maybe_Deconstruct_ShouldCorrectlyDeconstructSome()
     {
         var guid = Guid.NewGuid();
         var some = Maybe.Some(guid);
 
         var (isSome, value) = some;
 
-        isSome.ShouldBeTrue();
-        value.ShouldBe(guid);
+        using (Assert.Multiple())
+        {
+            await Assert.That(isSome).IsTrue();
+            await Assert.That(value).IsEqualTo(guid);
+        }
     }
 }

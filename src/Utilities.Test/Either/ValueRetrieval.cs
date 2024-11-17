@@ -1,117 +1,135 @@
 ﻿namespace Utilities.Test.Either;
 
 using System;
-using Shouldly;
-using Xunit;
 using Either = Utilities.Either;
 
 public class ValueRetrieval
 {
-    [Fact]
-    public void Either_GetLeft_ShouldReturnValueForLeftCase()
-    {
-        Either<string, string> either = Either.Left("left value");
-        either.UnwrapLeft().ShouldBe("left value");
-    }
-
-    [Fact]
-    public void Either_GetLeft_ShouldThrowForRightCase()
-    {
-        Either<string, string> either = Either.Right("right value");
-        Should.Throw<InvalidOperationException>(() => either.UnwrapLeft());
-    }
-
-    [Fact]
-    public void Either_GetRight_ShouldReturnValueForRightCase()
-    {
-        Either<string, string> either = Either.Right("right value");
-        either.UnwrapRight().ShouldBe("right value");
-    }
-
-    [Fact]
-    public void Either_GetRight_ShouldThrowForLeftCase()
-    {
-        Either<string, string> either = Either.Left("left value");
-        Should.Throw<InvalidOperationException>(() => either.UnwrapRight());
-    }
-
-    [Fact]
-    public void Either_TryGetLeft_ShouldReturnTrueAndValueForLeftCase()
+    [Test]
+    public async ValueTask Either_GetLeft_ShouldReturnValueForLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
 
-        either.TryUnwrapLeft(out var result).ShouldBeTrue();
-        result.ShouldBe("left value");
+        await Assert.That(either.UnwrapLeft()).IsEqualTo("left value");
     }
 
-    [Fact]
-    public void Either_TryGetLeft_ShouldReturnFalseAndDefaultForRightCase()
+    [Test]
+    public async ValueTask Either_GetLeft_ShouldThrowForRightCase()
     {
         Either<string, string> either = Either.Right("right value");
 
-        either.TryUnwrapLeft(out var result).ShouldBeFalse();
-        result.ShouldBe(default);
+        await Assert.That(() => either.UnwrapLeft()).Throws<InvalidOperationException>();
     }
 
-    [Fact]
-    public void Either_TryGetRight_ShouldReturnTrueAndValueForRightCase()
+    [Test]
+    public async ValueTask Either_GetRight_ShouldReturnValueForRightCase()
     {
         Either<string, string> either = Either.Right("right value");
 
-        either.TryUnwrapRight(out var result).ShouldBeTrue();
-        result.ShouldBe("right value");
+        await Assert.That(either.UnwrapRight()).IsEqualTo("right value");
     }
 
-    [Fact]
-    public void Either_TryGetRight_ShouldReturnFalseAndDefaultForLeftCase()
+    [Test]
+    public async ValueTask Either_GetRight_ShouldThrowForLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
 
-        either.TryUnwrapRight(out var result).ShouldBeFalse();
-        result.ShouldBe(default);
+        await Assert.That(() => either.UnwrapRight()).Throws<InvalidOperationException>();
     }
 
-    [Fact]
-    public void Either_GetLeftOrDefault_ShouldReturnValueForLeftCase()
+    [Test]
+    public async ValueTask Either_TryGetLeft_ShouldReturnTrueAndValueForLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
-        either.UnwrapLeftOrDefault().ShouldBe("left value");
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.TryUnwrapLeft(out var result)).IsTrue();
+            await Assert.That(result).IsEqualTo("left value");
+        }
     }
 
-    [Fact]
-    public void Either_GetLeftOrDefault_ShouldReturnDefaultForRightCase()
+    [Test]
+    public async ValueTask Either_TryGetLeft_ShouldReturnFalseAndDefaultForRightCase()
     {
         Either<string, string> either = Either.Right("right value");
-        either.UnwrapLeftOrDefault().ShouldBe(default);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.TryUnwrapLeft(out var result)).IsFalse();
+            await Assert.That(result).IsDefault();
+        }
     }
 
-    [Fact]
-    public void Either_GetRightOrDefault_ShouldReturnValueForRightCase()
+    [Test]
+    public async ValueTask Either_TryGetRight_ShouldReturnTrueAndValueForRightCase()
     {
         Either<string, string> either = Either.Right("right value");
-        either.UnwrapRightOrDefault().ShouldBe("right value");
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.TryUnwrapRight(out var result)).IsTrue();
+            await Assert.That(result).IsEqualTo("right value");
+        }
     }
 
-    [Fact]
-    public void Either_GetRightOrDefault_ShouldReturnDefaultForLeftCase()
+    [Test]
+    public async ValueTask Either_TryGetRight_ShouldReturnFalseAndDefaultForLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
-        either.UnwrapRightOrDefault().ShouldBe(default);
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(either.TryUnwrapRight(out var result)).IsFalse();
+            await Assert.That(result).IsDefault();
+        }
     }
 
-    [Fact]
-    public void Either_Match_ShouldMatchOnLeftCase()
+    [Test]
+    public async ValueTask Either_GetLeftOrDefault_ShouldReturnValueForLeftCase()
     {
         Either<string, string> either = Either.Left("left value");
-        
-        either.Match(left => left, right => right).ShouldBe("left value");
+
+        await Assert.That(either.UnwrapLeftOrDefault()).IsEqualTo("left value");
     }
 
-    [Fact]
-    public void Either_Match_ShouldMatchOnRightCase()
+    [Test]
+    public async ValueTask Either_GetLeftOrDefault_ShouldReturnDefaultForRightCase()
     {
         Either<string, string> either = Either.Right("right value");
-        
-        either.Match(left => left, right => right).ShouldBe("right value");
+
+        await Assert.That(either.UnwrapLeftOrDefault()).IsDefault();
+    }
+
+    [Test]
+    public async ValueTask Either_GetRightOrDefault_ShouldReturnValueForRightCase()
+    {
+        Either<string, string> either = Either.Right("right value");
+
+        await Assert.That(either.UnwrapRightOrDefault()).IsEqualTo("right value");
+    }
+
+    [Test]
+    public async ValueTask Either_GetRightOrDefault_ShouldReturnDefaultForLeftCase()
+    {
+        Either<string, string> either = Either.Left("left value");
+
+        await Assert.That(either.UnwrapRightOrDefault()).IsDefault();
+    }
+
+    [Test]
+    public async ValueTask Either_Match_ShouldMatchOnLeftCase()
+    {
+        Either<string, string> either = Either.Left("left value");
+
+        await Assert.That(either.Match(left => left, right => right)).IsEqualTo("left value");
+    }
+
+    [Test]
+    public async ValueTask Either_Match_ShouldMatchOnRightCase()
+    {
+        Either<string, string> either = Either.Right("right value");
+
+        await Assert.That(either.Match(left => left, right => right)).IsEqualTo("right value");
     }
 }

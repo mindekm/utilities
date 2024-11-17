@@ -2,172 +2,183 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using AutoFixture;
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class EnumerableExtensionsTestSuite
 {
-    private static readonly Fixture Fixture = new Fixture();
-
-    public static IEnumerable<object[]> EmptyEnumerableData()
+    public static IEnumerable<Func<IEnumerable<string>>> EmptyEnumerableData()
     {
-        yield return new object[] { new List<string>() };
-        yield return new object[] { GetEnumerable() };
+        yield return () => new List<string>();
+        yield return GetEnumerable;
+        yield break;
 
-        IEnumerable<string> GetEnumerable()
+        static IEnumerable<string> GetEnumerable()
         {
             yield break;
         }
     }
 
-    public static IEnumerable<object[]> NonEmptyEnumerableData()
+    public static IEnumerable<Func<IEnumerable<string>>> NonEmptyEnumerableData()
     {
-        yield return new object[] { Fixture.CreateMany<string>().ToList() };
-        yield return new object[] { GetEnumerable() };
+        yield return () => [Guid.NewGuid().ToString(), Guid.NewGuid().ToString()];
+        yield return GetEnumerable;
+        yield break;
 
-        IEnumerable<string> GetEnumerable()
+        static IEnumerable<string> GetEnumerable()
         {
-            yield return Fixture.Create<string>();
-            yield return Fixture.Create<string>();
+            yield return Guid.NewGuid().ToString();
+            yield return Guid.NewGuid().ToString();
         }
     }
 
-    public static IEnumerable<object[]> SingleElementEnumerableData()
+    public static IEnumerable<Func<IEnumerable<string>>> SingleElementEnumerableData()
     {
-        yield return new object[] { new List<string> { Fixture.Create<string>() } };
-        yield return new object[] { GetEnumerable() };
+        yield return () => [Guid.NewGuid().ToString()];
+        yield return GetEnumerable;
+        yield break;
 
-        IEnumerable<string> GetEnumerable()
+        static IEnumerable<string> GetEnumerable()
         {
-            yield return Fixture.Create<string>();
+            yield return Guid.NewGuid().ToString();
         }
     }
 
-    [Theory]
-    [MemberData(nameof(NonEmptyEnumerableData))]
-    public void FirstOrNone_ShouldReturnSomeForNonEmptySequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(NonEmptyEnumerableData))]
+    public async ValueTask FirstOrNone_ShouldReturnSomeForNonEmptySequence(IEnumerable<string> source)
     {
-        source.FirstOrNone().IsSome.ShouldBeTrue();
+        await Assert.That(source.FirstOrNone().IsSome).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(EmptyEnumerableData))]
-    public void FirstOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(EmptyEnumerableData))]
+    public async ValueTask FirstOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
     {
-        source.FirstOrNone().IsNone.ShouldBeTrue();
+        await Assert.That(source.FirstOrNone().IsNone).IsTrue();
     }
 
-    [Fact]
-    public void FirstOrNone_ShouldReturnSomeForFirstElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask FirstOrNone_ShouldReturnSomeForFirstElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
         var maybe = list.FirstOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal));
-        maybe.IsSome.ShouldBeTrue();
-        maybe.Unwrap().ShouldBe("Test2");
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(maybe.IsSome).IsTrue();
+            await Assert.That(maybe.Unwrap()).IsEqualTo("Test2");
+        }
     }
 
-    [Fact]
-    public void FirstOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask FirstOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3" };
 
-        list.FirstOrNone(e => e == "Test4").IsNone.ShouldBeTrue();
+        await Assert.That(list.FirstOrNone(e => e == "Test4").IsNone).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(NonEmptyEnumerableData))]
-    public void LastOrNone_ShouldReturnSomeForNonEmptySequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(NonEmptyEnumerableData))]
+    public async ValueTask LastOrNone_ShouldReturnSomeForNonEmptySequence(IEnumerable<string> source)
     {
-        source.LastOrNone().IsSome.ShouldBeTrue();
+        await Assert.That(source.LastOrNone().IsSome).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(EmptyEnumerableData))]
-    public void LastOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(EmptyEnumerableData))]
+    public async ValueTask LastOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
     {
-        source.LastOrNone().IsNone.ShouldBeTrue();
+        await Assert.That(source.LastOrNone().IsNone).IsTrue();
     }
 
-    [Fact]
-    public void LastOrNone_ShouldReturnSomeForLastElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask LastOrNone_ShouldReturnSomeForLastElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
         var maybe = list.LastOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal));
-        maybe.IsSome.ShouldBeTrue();
-        maybe.Unwrap().ShouldBe("Test22");
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(maybe.IsSome).IsTrue();
+            await Assert.That(maybe.Unwrap()).IsEqualTo("Test22");
+        }
     }
 
-    [Fact]
-    public void LastOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask LastOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3" };
 
-        list.LastOrNone(e => e == "Test4").IsNone.ShouldBeTrue();
+        await Assert.That(list.LastOrNone(e => e == "Test4").IsNone).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(SingleElementEnumerableData))]
-    public void SingleOrNone_ShouldReturnSomeForSingleItemSequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(SingleElementEnumerableData))]
+    public async ValueTask SingleOrNone_ShouldReturnSomeForSingleItemSequence(IEnumerable<string> source)
     {
-        source.SingleOrNone().IsSome.ShouldBeTrue();
+        await Assert.That(source.SingleOrNone().IsSome).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(EmptyEnumerableData))]
-    public void SingleOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(EmptyEnumerableData))]
+    public async ValueTask SingleOrNone_ShouldReturnNoneForEmptySequence(IEnumerable<string> source)
     {
-        source.SingleOrNone().IsNone.ShouldBeTrue();
+        await Assert.That(source.SingleOrNone().IsNone).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(NonEmptyEnumerableData))]
-    public void SingleOrNone_ShouldThrowForSequenceWithMoreThanOneItem(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(NonEmptyEnumerableData))]
+    public async ValueTask SingleOrNone_ShouldThrowForSequenceWithMoreThanOneItem(IEnumerable<string> source)
     {
-        Should.Throw<InvalidOperationException>(() => source.SingleOrNone());
+        await Assert.That(source.SingleOrNone).Throws<InvalidOperationException>();
     }
 
-    [Fact]
-    public void SingeOrNone_ShouldReturnSomeForSingleElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask SingeOrNone_ShouldReturnSomeForSingleElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
         var maybe = list.SingleOrNone(e => e.StartsWith("Test3", StringComparison.Ordinal));
-        maybe.IsSome.ShouldBeTrue();
-        maybe.Unwrap().ShouldBe("Test3");
+
+        using (Assert.Multiple())
+        {
+            await Assert.That(maybe.IsSome).IsTrue();
+            await Assert.That(maybe.Unwrap()).IsEqualTo("Test3");
+        }
     }
 
-    [Fact]
-    public void SingleOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask SingleOrNone_ShouldReturnNoneIfSequenceDoesNotContainElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test22" };
 
-        list.SingleOrNone(e => e == "Test4").IsNone.ShouldBeTrue();
+        await Assert.That(list.SingleOrNone(e => e == "Test4").IsNone).IsTrue();
     }
 
-    [Fact]
-    public void SingleOrNone_ShouldThrowIfSequenceContainsMoreThanOneElementSatisfyingThePredicate()
+    [Test]
+    public async ValueTask SingleOrNone_ShouldThrowIfSequenceContainsMoreThanOneElementSatisfyingThePredicate()
     {
         var list = new List<string> { "Test1", "Test2", "Test3", "Test22" };
 
-        Should.Throw<InvalidOperationException>(() => list.SingleOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal)));
+        await Assert
+            .That(() => list.SingleOrNone(e => e.StartsWith("Test2", StringComparison.Ordinal)))
+            .Throws<InvalidOperationException>();
     }
 
-    [Theory]
-    [MemberData(nameof(NonEmptyEnumerableData))]
-    public void ElementAtOrNone_ShouldReturnSomeForValidIndex(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(NonEmptyEnumerableData))]
+    public async ValueTask ElementAtOrNone_ShouldReturnSomeForValidIndex(IEnumerable<string> source)
     {
-        source.ElementAtOrNone(1).IsSome.ShouldBeTrue();
+        await Assert.That(source.ElementAtOrNone(1).IsSome).IsTrue();
     }
 
-    [Theory]
-    [MemberData(nameof(EmptyEnumerableData))]
-    public void ElementAtOrNone_ShouldReturnNoneForInvalidIndex(IEnumerable<string> source)
+    [Test]
+    [MethodDataSource(nameof(EmptyEnumerableData))]
+    public async ValueTask ElementAtOrNone_ShouldReturnNoneForInvalidIndex(IEnumerable<string> source)
     {
-        source.ElementAtOrNone(1).IsNone.ShouldBeTrue();
+        await Assert.That(source.ElementAtOrNone(1).IsNone).IsTrue();
     }
 }

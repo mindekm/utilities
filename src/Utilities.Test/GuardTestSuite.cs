@@ -2,102 +2,100 @@
 
 using System;
 using System.Collections.Generic;
-using Shouldly;
-using Xunit;
 
 public class GuardTestSuite
 {
-    [Fact]
-    public void Guard_NotNull_ShouldThrowOnNullInput()
+    [Test]
+    public async ValueTask Guard_NotNull_ShouldThrowOnNullInput()
     {
-        Should.Throw<ArgumentNullException>(() => Guard.NotNull(null));
+        await Assert.That(() => Guard.NotNull(null)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Guard_NotNull_ShouldNotThrowOnNonNullInput()
+    [Test]
+    public async ValueTask Guard_NotNull_ShouldNotThrowOnNonNullInput()
     {
-        Should.NotThrow(() => Guard.NotNull(string.Empty));
+        await Assert.That(() => Guard.NotNull(string.Empty)).ThrowsNothing();
     }
 
-    [Fact]
-    public void Guard_NotDefault_ShouldThrowOnUninitializedInput()
+    [Test]
+    public async ValueTask Guard_NotDefault_ShouldThrowOnUninitializedInput()
     {
-        Should.Throw<ArgumentException>(() => Guard.NotDefault(default(int)));
+        await Assert.That(() => Guard.NotDefault(default(int))).Throws<ArgumentException>();
     }
 
-    [Fact]
-    public void Guard_NotDefault_ShouldNotThrowOnInitializedInput()
+    [Test]
+    public async ValueTask Guard_NotDefault_ShouldNotThrowOnInitializedInput()
     {
-        Should.NotThrow(() => Guard.NotDefault(1));
+        await Assert.That(() => Guard.NotDefault(1)).ThrowsNothing();
     }
 
-    [Fact]
-    public void Guard_HasValue_ShouldThrowOnNullableWithoutValue()
+    [Test]
+    public async ValueTask Guard_HasValue_ShouldThrowOnNullableWithoutValue()
     {
-        Should.Throw<ArgumentException>(() => Guard.HasValue(new int?()));
+        await Assert.That(() => Guard.HasValue(new int?())).Throws<ArgumentException>();
     }
 
-    [Fact]
-    public void Guard_HasValue_ShouldNotThrowOnNullableWithValue()
+    [Test]
+    public async ValueTask Guard_HasValue_ShouldNotThrowOnNullableWithValue()
     {
-        Should.NotThrow(() => Guard.HasValue(new int?(1)));
+        await Assert.That(() => Guard.HasValue(new int?(1))).ThrowsNothing();
     }
 
-    [Fact]
-    public void Guard_HasElements_ShouldThrowOnNullCollection()
+    [Test]
+    public async ValueTask Guard_HasElements_ShouldThrowOnNullCollection()
     {
-        Should.Throw<ArgumentNullException>(() => Guard.HasElements((List<string>) null));
+        await Assert.That(() => Guard.HasElements((List<string>)null)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Guard_HasElements_ShouldThrowOnEmptyCollection()
+    [Test]
+    public async ValueTask Guard_HasElements_ShouldThrowOnEmptyCollection()
     {
-        Should.Throw<ArgumentException>(() => Guard.HasElements(new List<string>()));
+        await Assert.That(() => Guard.HasElements(new List<string>())).Throws<ArgumentException>();
     }
 
-    [Fact]
-    public void Guard_HasElements_ShouldNotThrowOnCollectionWithElements()
+    [Test]
+    public async ValueTask Guard_HasElements_ShouldNotThrowOnCollectionWithElements()
     {
-        Should.NotThrow(() => Guard.HasElements(new List<string> { "Test" }));
+        await Assert.That(() => Guard.HasElements(new List<string>{"Test"})).ThrowsNothing();
     }
 
-    [Fact]
-    public void Guard_NotNullOrEmpty_ShouldThrowOnNullString()
+    [Test]
+    public async ValueTask Guard_NotNullOrEmpty_ShouldThrowOnNullString()
     {
-        Should.Throw<ArgumentNullException>(() => Guard.NotNullOrEmpty(null));
+        await Assert.That(() => Guard.NotNullOrEmpty(null)).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Guard_NotNullOrEmpty_ShouldThrowOnEmptyString()
+    [Test]
+    public async ValueTask Guard_NotNullOrEmpty_ShouldThrowOnEmptyString()
     {
-        Should.Throw<ArgumentException>(() => Guard.NotNullOrEmpty(string.Empty));
+        await Assert.That(() => Guard.NotNullOrEmpty(string.Empty)).Throws<ArgumentException>();
     }
 
-    [Theory]
-    [InlineData(" ")]
-    [InlineData("Test")]
-    public void Guard_NotNullOrEmpty_ShouldNotThrowOnNonEmptyString(string value)
+    [Test]
+    [Arguments(" ")]
+    [Arguments("Test")]
+    public async ValueTask Guard_NotNullOrEmpty_ShouldNotThrowOnNonEmptyString(string value)
     {
-        Should.NotThrow(() => Guard.NotNullOrEmpty(value));
+        await Assert.That(() => Guard.NotNullOrEmpty(value)).ThrowsNothing();
     }
 
-    [Fact]
-    public void Guard_NotNullOrWhitespace_ShouldThrowOnNullString()
+    [Test]
+    public async ValueTask Guard_NotNullOrWhitespace_ShouldThrowOnNullString()
     {
-        Should.Throw<ArgumentNullException>(() => Guard.NotNullOrWhitespace(null));
+        await Assert.That(() => Guard.NotNullOrWhitespace(null)).Throws<ArgumentNullException>();
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    public void Guard_NotNullOrWhitespace_ShouldThrowOnEmptyOrWhitespaceString(string value)
+    [Test]
+    [Arguments("")]
+    [Arguments(" ")]
+    public async ValueTask Guard_NotNullOrWhitespace_ShouldThrowOnEmptyOrWhitespaceString(string value)
     {
-        Should.Throw<ArgumentException>(() => Guard.NotNullOrWhitespace(value));
+        await Assert.That(() => Guard.NotNullOrWhitespace(value)).Throws<ArgumentException>();
     }
 
-    [Fact]
-    public void Guard_NotNullOrWhitespace_ShouldNotThrowOnNonEmptyOrWhitespaceString()
+    [Test]
+    public async ValueTask Guard_NotNullOrWhitespace_ShouldNotThrowOnNonEmptyOrWhitespaceString()
     {
-        Should.NotThrow(() => Guard.NotNullOrWhitespace("Test"));
+        await Assert.That(() => Guard.NotNullOrWhitespace("Test")).ThrowsNothing();
     }
 }
