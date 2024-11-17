@@ -1,52 +1,59 @@
 namespace Utilities.Test.Maybe;
 
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class Comparable
 {
-    [Fact]
-    public void Maybe_CompareTo_SomeShouldBeGreaterThanNone()
+    [Test]
+    public async ValueTask Maybe_CompareTo_SomeShouldBeGreaterThanNone()
     {
         var some = Maybe.Some(10);
         Maybe<int> none = Maybe.None;
 
-        some.CompareTo(none).ShouldBe(1);
-        some.CompareTo((object)none).ShouldBe(1);
-        (some > none).ShouldBeTrue();
-        (none < some).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some.CompareTo(none)).IsEqualTo(1);
+            await Assert.That(some.CompareTo((object)none)).IsEqualTo(1);
+            await Assert.That(some > none).IsTrue();
+            await Assert.That(none < some).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Maybe_CompareTo_NoneShouldBeSmallerThanSome()
+    [Test]
+    public async ValueTask Maybe_CompareTo_NoneShouldBeSmallerThanSome()
     {
         var some = Maybe.Some(10);
         Maybe<int> none = Maybe.None;
 
-        none.CompareTo(some).ShouldBe(-1);
-        none.CompareTo((object)some).ShouldBe(-1);
-        (none < some).ShouldBeTrue();
-        (some > none).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(none.CompareTo(some)).IsEqualTo(-1);
+            await Assert.That(none.CompareTo((object)some)).IsEqualTo(-1);
+            await Assert.That(none < some).IsTrue();
+            await Assert.That(some > none).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Maybe_CompareTo_SomeShouldBeEqualToSomeIfUnderlyingValuesAreEqual()
+    [Test]
+    public async ValueTask Maybe_CompareTo_SomeShouldBeEqualToSomeIfUnderlyingValuesAreEqual()
     {
         var some1 = Maybe.Some(10);
         var some2 = Maybe.Some(10);
 
-        some1.CompareTo(some2).ShouldBe(0);
-        some1.CompareTo((object)some2).ShouldBe(0);
-        (some1 >= some2).ShouldBeTrue();
-        (some1 <= some2).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some1.CompareTo(some2)).IsEqualTo(0);
+            await Assert.That(some1.CompareTo((object)some2)).IsEqualTo(0);
+            await Assert.That(some1 >= some2).IsTrue();
+            await Assert.That(some1 <= some2).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Maybe_CompareTo_ShouldThrowForIncompatibleTypes()
+    [Test]
+    public async ValueTask Maybe_CompareTo_ShouldThrowForIncompatibleTypes()
     {
         var some = Maybe.Some(10);
 
-        Should.Throw<ArgumentException>(() => some.CompareTo(5));
+        await Assert.That(() => some.CompareTo(5)).Throws<ArgumentException>();
     }
 }

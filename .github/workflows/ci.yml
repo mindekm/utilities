@@ -29,12 +29,12 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      working-directory: ./src
+      working-directory: ./src/Utilities
       run: dotnet build --configuration Release --no-restore --warnaserror
 
     - name: Test
-      working-directory: ./src
-      run: dotnet test --configuration Release --no-restore --logger trx
+      working-directory: ./src/Utilities.Test
+      run: dotnet run --configuration Release --no-restore --report-trx
 
     - name: Publish results
       uses: EnricoMi/publish-unit-test-result-action@170bf24d20d201b842d7a52403b73ed297e6645b # 2.18.0

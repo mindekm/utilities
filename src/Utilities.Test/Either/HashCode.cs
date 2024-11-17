@@ -1,48 +1,58 @@
 ﻿namespace Utilities.Test.Either;
 
-using Shouldly;
-using Xunit;
 using Either = Utilities.Either;
 
 public class HashCode
 {
-    [Fact]
-    public void Either_GetHashCode_LeftAndRightHashCodesShouldNotBeTheSame()
+    [Test]
+    public async ValueTask Either_GetHashCode_LeftAndRightHashCodesShouldNotBeTheSame()
     {
         Either<string, string> left = Either.Left("value");
         Either<string, string> right = Either.Right("value");
 
-        left.GetHashCode().ShouldNotBe(right.GetHashCode());
-        left.ShouldNotBe(right);
+        using (Assert.Multiple())
+        {
+            await Assert.That(left.GetHashCode()).IsNotEqualTo(right.GetHashCode());
+            await Assert.That(left).IsNotEqualTo(right);
+        }
     }
 
-    [Fact]
-    public void Either_GetHashCode_LeftHashCodeShouldBeEqualToItsCopy()
+    [Test]
+    public async ValueTask Either_GetHashCode_LeftHashCodeShouldBeEqualToItsCopy()
     {
         Either<string, string> left = Either.Left("left value");
         Either<string, string> copy = Either.Left("left value");
 
-        left.GetHashCode().ShouldBe(copy.GetHashCode());
-        left.ShouldBe(copy);
+        using (Assert.Multiple())
+        {
+            await Assert.That(left.GetHashCode()).IsEqualTo(copy.GetHashCode());
+            await Assert.That(left).IsEqualTo(copy);
+        }
     }
 
-    [Fact]
-    public void Either_GetHashCode_RightHashCodeShouldBeEqualToItsCopy()
+    [Test]
+    public async ValueTask Either_GetHashCode_RightHashCodeShouldBeEqualToItsCopy()
     {
         Either<string, string> right = Either.Right("right value");
         Either<string, string> copy = Either.Right("right value");
 
-        right.GetHashCode().ShouldBe(copy.GetHashCode());
-        right.ShouldBe(copy);
+        using (Assert.Multiple())
+        {
+            await Assert.That(right.GetHashCode()).IsEqualTo(copy.GetHashCode());
+            await Assert.That(right).IsEqualTo(copy);
+        }
     }
 
-    [Fact]
-    public void Either_GetHashCode_UninitializedValuesShouldBeEqual()
+    [Test]
+    public async ValueTask Either_GetHashCode_UninitializedValuesShouldBeEqual()
     {
         Either<string, string> default1 = default;
         Either<string, string> default2 = default;
 
-        default1.GetHashCode().ShouldBe(default2.GetHashCode());
-        default1.ShouldBe(default2);
+        using (Assert.Multiple())
+        {
+            await Assert.That(default1.GetHashCode()).IsEqualTo(default2.GetHashCode());
+            await Assert.That(default1).IsEqualTo(default2);
+        }
     }
 }

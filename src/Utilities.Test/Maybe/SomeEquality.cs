@@ -1,82 +1,94 @@
 namespace Utilities.Test.Maybe;
 
-using AutoFixture;
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class SomeEquality
 {
-    private readonly Fixture fixture = new Fixture();
-
-    [Fact]
-    public void Some_ShouldBeEqualToSelf()
+    [Test]
+    public async ValueTask Some_ShouldBeEqualToSelf()
     {
-        var first = Maybe.Some(fixture.Create<string>());
+        var first = Maybe.Some(Guid.NewGuid().ToString());
         var second = first;
 
-        first.Equals(second).ShouldBeTrue();
-        first.Equals((object)second).ShouldBeTrue();
-        (first == second).ShouldBeTrue();
-        (first != second).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(first.Equals(second)).IsTrue();
+            await Assert.That(first.Equals((object)second)).IsTrue();
+            await Assert.That(first == second).IsTrue();
+            await Assert.That(first != second).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Some_ShouldBeEqualToOtherSome()
+    [Test]
+    public async ValueTask Some_ShouldBeEqualToOtherSome()
     {
-        var value = fixture.Create<string>();
+        var value = Guid.NewGuid().ToString();
         var first = Maybe.Some(value);
         var second = Maybe.Some(value);
 
-        first.Equals(second).ShouldBeTrue();
-        first.Equals((object)second).ShouldBeTrue();
-        (first == second).ShouldBeTrue();
-        (first != second).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(first.Equals(second)).IsTrue();
+            await Assert.That(first.Equals((object)second)).IsTrue();
+            await Assert.That(first == second).IsTrue();
+            await Assert.That(first != second).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Some_ShouldNotBeEqualToNull()
+    [Test]
+    public async ValueTask Some_ShouldNotBeEqualToNull()
     {
-        var some = Maybe.Some(fixture.Create<string>());
+        var some = Maybe.Some(Guid.NewGuid().ToString());
 
-        some.Equals(null).ShouldBeFalse();
-        some.Equals((object)null).ShouldBeFalse();
+        await Assert.That(some.Equals(null)).IsFalse();
     }
 
-    [Fact]
-    public void Some_ShouldNotBeEqualToDefaultValue()
+    [Test]
+    public async ValueTask Some_ShouldNotBeEqualToDefaultValue()
     {
-        var some = Maybe.Some(fixture.Create<string>());
+        var some = Maybe.Some(Guid.NewGuid().ToString());
 
-        some.Equals(default).ShouldBeFalse();
-        some.Equals((object)default(Maybe<string>)).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some.Equals(default)).IsFalse();
+            await Assert.That(some.Equals((object)default(Maybe<string>))).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Some_ShouldNotBeEqualToNone()
+    [Test]
+    public async ValueTask Some_ShouldNotBeEqualToNone()
     {
-        var some = Maybe.Some(fixture.Create<string>());
+        var some = Maybe.Some(Guid.NewGuid().ToString());
 
-        some.Equals(Maybe.None).ShouldBeFalse();
-        some.Equals((object)default(Maybe<string>)).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some.Equals(Maybe.None)).IsFalse();
+            await Assert.That(some.Equals((object)default(Maybe<string>))).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Some_ShouldNotBeEqualToNoneForDefaultValueType()
+    [Test]
+    public async ValueTask Some_ShouldNotBeEqualToNoneForDefaultValueType()
     {
         var some = Maybe.Some(default(int));
 
-        some.Equals(Maybe.None).ShouldBeFalse();
-        some.Equals((object)default(Maybe<int>)).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some.Equals(Maybe.None)).IsFalse();
+            await Assert.That(some.Equals((object)default(Maybe<int>))).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Some_ShouldNotBeEqualToSomeOtherType()
+    [Test]
+    public async ValueTask Some_ShouldNotBeEqualToSomeOtherType()
     {
-        var value = fixture.Create<string>();
+        var value = Guid.NewGuid().ToString();
         var some = Maybe.Some(value);
 
-        some.Equals(Maybe.Some(10)).ShouldBeFalse();
-        some.Equals(value).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(some.Equals(Maybe.Some(10))).IsFalse();
+            await Assert.That(some.Equals(value)).IsFalse();
+        }
     }
 }

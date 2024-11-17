@@ -2,44 +2,54 @@
 
 using System.Text;
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class NoneEquality
 {
     private readonly Maybe<string> none = Maybe.None;
 
-    [Fact]
-    public void None_ShouldBeEqualToSelf()
+    [Test]
+    public async ValueTask None_ShouldBeEqualToSelf()
     {
-        none.Equals(none).ShouldBeTrue();
-        none.Equals((object)none).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(none.Equals(none)).IsTrue();
+            await Assert.That(none.Equals((object)none)).IsTrue();
+        }
     }
 
-    [Fact]
-    public void None_ShouldBeEqualToOtherNone()
+    [Test]
+    public async ValueTask None_ShouldBeEqualToOtherNone()
     {
-        none.Equals(Maybe.None).ShouldBeTrue();
-        none.Equals((object)default(Maybe<string>)).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(none.Equals(Maybe.None)).IsTrue();
+            await Assert.That(none.Equals((object)default(Maybe<string>))).IsTrue();
+        }
     }
 
-    [Fact]
-    public void None_ShouldBeEqualToDefaultValue()
+    [Test]
+    public async ValueTask None_ShouldBeEqualToDefaultValue()
     {
-        none.Equals(default).ShouldBeTrue();
-        none.Equals((object)default(Maybe<string>)).ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(none.Equals(default)).IsTrue();
+            await Assert.That(none.Equals((object)default(Maybe<string>))).IsTrue();
+        }
     }
 
-    [Fact]
-    public void None_ShouldNotBeEqualToSome()
+    [Test]
+    public async ValueTask None_ShouldNotBeEqualToSome()
     {
-        none.Equals(Maybe.Some("value")).ShouldBeFalse();
-        none.Equals((object)Maybe.Some("value")).ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(none.Equals(Maybe.Some("value"))).IsFalse();
+            await Assert.That(none.Equals((object)Maybe.Some("value"))).IsFalse();
+        }
     }
 
-    [Fact]
-    public void None_ShouldNotBeEqualToSomeOtherType()
+    [Test]
+    public async ValueTask None_ShouldNotBeEqualToSomeOtherType()
     {
-        none.Equals(Maybe.Some(new StringBuilder())).ShouldBeFalse();
+        await Assert.That(none.Equals(Maybe.Some(new StringBuilder()))).IsFalse();
     }
 }

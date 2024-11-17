@@ -3,131 +3,136 @@ namespace Utilities.Test.Maybe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoFixture;
 using Utilities;
-using Shouldly;
-using Xunit;
 
 public class MaybeTestSuite
 {
-    private readonly Fixture fixture = new Fixture();
-
-    [Fact]
-    public void Maybe_Some_ShouldCreateSome()
+    [Test]
+    public async ValueTask Maybe_Some_ShouldCreateSome()
     {
-        Maybe.Some(fixture.Create<string>()).IsSome.ShouldBeTrue();
+        await Assert.That(Maybe.Some(Guid.NewGuid().ToString()).IsSome).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_None_ShouldCreateNone()
+    [Test]
+    public async ValueTask Maybe_None_ShouldCreateNone()
     {
         Maybe<string> maybe = Maybe.None;
 
-        maybe.IsNone.ShouldBeTrue();
+        await Assert.That(maybe.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_IsSome_ShouldReturnTrueForSome()
+    [Test]
+    public async ValueTask Maybe_IsSome_ShouldReturnTrueForSome()
     {
-        var maybe = Maybe.Some(fixture.Create<string>());
+        var maybe = Maybe.Some(Guid.NewGuid().ToString());
 
-        maybe.IsSome.ShouldBeTrue();
-        maybe.IsNone.ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(maybe.IsSome).IsTrue();
+            await Assert.That(maybe.IsNone).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Maybe_IsNone_ShouldReturnTrueForNone()
+    [Test]
+    public async ValueTask Maybe_IsNone_ShouldReturnTrueForNone()
     {
         Maybe<string> maybe = Maybe.None;
 
-        maybe.IsSome.ShouldBeFalse();
-        maybe.IsNone.ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(maybe.IsSome).IsFalse();
+            await Assert.That(maybe.IsNone).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Maybe_ToMaybe_ShouldCreateSomeFromNonNullReferenceType()
+    [Test]
+    public async ValueTask Maybe_ToMaybe_ShouldCreateSomeFromNonNullReferenceType()
     {
-        var maybe = fixture.Create<string>().ToMaybe();
+        var maybe = Guid.NewGuid().ToString().ToMaybe();
 
-        maybe.IsSome.ShouldBeTrue();
+        await Assert.That(maybe.IsSome).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_ToMaybe_ShouldCreateNoneFromNullReferenceType()
+    [Test]
+    public async ValueTask Maybe_ToMaybe_ShouldCreateNoneFromNullReferenceType()
     {
         var maybe = ((string)null).ToMaybe();
 
-        maybe.IsNone.ShouldBeTrue();
+        await Assert.That(maybe.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_ToMaybe_ShouldCreateSomeFromNullableTypeWithValue()
+    [Test]
+    public async ValueTask Maybe_ToMaybe_ShouldCreateSomeFromNullableTypeWithValue()
     {
         int? value = 1;
         var maybe = value.ToMaybe();
 
-        maybe.IsSome.ShouldBeTrue();
+        await Assert.That(maybe.IsSome).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_ToMaybe_ShouldCreateNoneFromNullableTypeWithoutValue()
+    [Test]
+    public async ValueTask Maybe_ToMaybe_ShouldCreateNoneFromNullableTypeWithoutValue()
     {
         int? value = default;
         var maybe = value.ToMaybe();
 
-        maybe.IsNone.ShouldBeTrue();
+        await Assert.That(maybe.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_ToNullable_ShouldCreateNullableWithValueFromSome()
+    [Test]
+    public async ValueTask Maybe_ToNullable_ShouldCreateNullableWithValueFromSome()
     {
-        Maybe.Some(1).ToNullable().HasValue.ShouldBeTrue();
+        await Assert.That(Maybe.Some(1).ToNullable().HasValue).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_ToNullable_ShouldCreateNullableWithoutValueFromNone()
+    [Test]
+    public async ValueTask Maybe_ToNullable_ShouldCreateNullableWithoutValueFromNone()
     {
-        default(Maybe<int>).ToNullable().HasValue.ShouldBeFalse();
+        await Assert.That(default(Maybe<int>).ToNullable().HasValue).IsFalse();
     }
 
-    [Fact]
-    public void Maybe_Flatten_ShouldReturnSomeForInnerSome()
+    [Test]
+    public async ValueTask Maybe_Flatten_ShouldReturnSomeForInnerSome()
     {
-        var inner = Maybe.Some(fixture.Create<string>());
+        var inner = Maybe.Some(Guid.NewGuid().ToString());
 
-        Maybe.Some(inner).Flatten().ShouldBe(inner);
+        await Assert.That(Maybe.Some(inner).Flatten()).IsEqualTo(inner);
     }
 
-    [Fact]
-    public void Maybe_Flatten_ShouldReturnNoneForInnerNone()
+    [Test]
+    public async ValueTask Maybe_Flatten_ShouldReturnNoneForInnerNone()
     {
-        default(Maybe<Maybe<string>>).Flatten().ShouldBe(Maybe.None);
+        await Assert.That(default(Maybe<Maybe<string>>).Flatten()).IsEqualTo(Maybe.None);
     }
 
-    [Fact]
-    public void Maybe_GetValues_ShouldValidateParameters()
+    [Test]
+    public async ValueTask Maybe_GetValues_ShouldValidateParameters()
     {
-        Should.Throw<ArgumentNullException>(() => ((List<Maybe<string>>) null).GetValues().ToList());
+        await Assert.That(() => ((List<Maybe<string>>)null).GetValues().ToList()).Throws<ArgumentNullException>();
     }
 
-    [Fact]
-    public void Maybe_GetValues_ShouldReturnValuesForSomeCases()
+    [Test]
+    public async ValueTask Maybe_GetValues_ShouldReturnValuesForSomeCases()
     {
-        var list = new List<Maybe<string>> { Maybe.Some(fixture.Create<string>()), Maybe.Some(fixture.Create<string>()) };
+        var list = new List<Maybe<string>>
+        {
+            Maybe.Some(Guid.NewGuid().ToString()),
+            Maybe.Some(Guid.NewGuid().ToString()),
+        };
 
-        list.GetValues().Count().ShouldBe(2);
+        await Assert.That(list.GetValues().Count()).IsEqualTo(2);
     }
 
-    [Fact]
-    public void Maybe_GetValues_ShouldReturnEmptyForNoneCases()
+    [Test]
+    public async ValueTask Maybe_GetValues_ShouldReturnEmptyForNoneCases()
     {
         var list = new List<Maybe<string>> { Maybe.None, Maybe.None };
 
-        list.GetValues().Count().ShouldBe(0);
+        await Assert.That(list.GetValues().Count()).IsEqualTo(0);
     }
 
-    [Fact]
-    public void Maybe_GetValues_ShouldReturnValuesFromMixedCases()
+    [Test]
+    public async ValueTask Maybe_GetValues_ShouldReturnValuesFromMixedCases()
     {
         var list = new List<Maybe<string>>
         {
@@ -135,351 +140,399 @@ public class MaybeTestSuite
             Maybe.None,
             Maybe.Some("Test2"),
             Maybe.None,
-            Maybe.Some(fixture.Create<string>()),
+            Maybe.Some(Guid.NewGuid().ToString()),
         };
 
-        list.GetValues().Count().ShouldBe(3);
+        await Assert.That(list.GetValues().Count()).IsEqualTo(3);
     }
 
-    [Fact]
-    public void Maybe_GetHashCode_ShouldReturnUnderlyingHashCodeForSome()
+    [Test]
+    public async ValueTask Maybe_GetHashCode_ShouldReturnUnderlyingHashCodeForSome()
     {
-        var test = fixture.Create<string>();
+        var test = Guid.NewGuid().ToString();
 
-        Maybe.Some(test).GetHashCode().ShouldBe(test.GetHashCode());
+        await Assert.That(Maybe.Some(test).GetHashCode()).IsEqualTo(test.GetHashCode());
     }
 
-    [Fact]
-    public void Maybe_GetHashCode_ShouldReturnZeroForNone()
+    [Test]
+    public async ValueTask Maybe_GetHashCode_ShouldReturnZeroForNone()
     {
-        default(Maybe<string>).GetHashCode().ShouldBe(0);
+        await Assert.That(default(Maybe<string>).GetHashCode()).IsEqualTo(0);
     }
 
-    [Fact]
-    public void Maybe_Expect_ShouldThrowWithTheProvidedMessageOnNone()
+    [Test]
+    public async ValueTask Maybe_Expect_ShouldThrowWithTheProvidedMessageOnNone()
     {
         Maybe<string> maybe = Maybe.None;
-        var message = fixture.Create<string>();
+        var message = Guid.NewGuid().ToString();
 
-        var exception = Should.Throw<InvalidOperationException>(() => maybe.Expect(message));
-        exception.Message.ShouldBe(message);
+        using (Assert.Multiple())
+        {
+            var exception = await Assert.That(() => maybe.Expect(message)).Throws<InvalidOperationException>();
+            await Assert.That(exception.Message).IsEqualTo(message);
+        }
     }
 
-    [Fact]
-    public void Maybe_Expect_ShouldReturnValueOnSome()
+    [Test]
+    public async ValueTask Maybe_Expect_ShouldReturnValueOnSome()
     {
-        var testValue = fixture.Create<string>();
+        var testValue = Guid.NewGuid().ToString();
         var maybe = Maybe.Some(testValue);
 
-        var value = Should.NotThrow(() => maybe.Expect(fixture.Create<string>()));
-        value.ShouldBe(testValue);
+        using (Assert.Multiple())
+        {
+            var value = await Assert.That(() => maybe.Expect("message")).ThrowsNothing();
+            await Assert.That(value).IsEqualTo(testValue);
+        }
     }
 
-    [Theory]
-    [InlineData(2)]
-    [InlineData(4)]
-    [InlineData(6)]
-    public void Maybe_IsSomeAnd_ShouldReturnTrueWhenSomeAndPredicateIsTrue(int input)
+    [Test]
+    [Arguments(2)]
+    [Arguments(4)]
+    [Arguments(6)]
+    public async ValueTask Maybe_IsSomeAnd_ShouldReturnTrueWhenSomeAndPredicateIsTrue(int input)
     {
         var maybe = Maybe.Some(input);
 
         var result = maybe.IsSomeAnd(v => v % 2 == 0);
 
-        result.ShouldBeTrue();
+        await Assert.That(result).IsTrue();
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(3)]
-    [InlineData(5)]
-    public void Maybe_IsSomeAnd_ShouldReturnFalseWhenSomeAndPredicateIsFalse(int input)
+    [Test]
+    [Arguments(1)]
+    [Arguments(3)]
+    [Arguments(5)]
+    public async ValueTask Maybe_IsSomeAnd_ShouldReturnFalseWhenSomeAndPredicateIsFalse(int input)
     {
         var maybe = Maybe.Some(input);
 
         var result = maybe.IsSomeAnd(v => v % 2 == 0);
 
-        result.ShouldBeFalse();
+        await Assert.That(result).IsFalse();
     }
 
-    [Fact]
-    public void Maybe_IsSomeAnd_ShouldReturnFalseWhenNone()
+    [Test]
+    public async ValueTask Maybe_IsSomeAnd_ShouldReturnFalseWhenNone()
     {
         Maybe<int> maybe = Maybe.None;
 
         var result = maybe.IsSomeAnd(v => v % 2 == 0);
 
-        result.ShouldBeFalse();
+        await Assert.That(result).IsFalse();
     }
 
-    [Fact]
-    public void Maybe_Bind_ShouldExecuteBinderWhenInitialIsSome()
+    [Test]
+    public async ValueTask Maybe_Bind_ShouldExecuteBinderWhenInitialIsSome()
     {
-        var value = fixture.Create<int>();
-        var inital = Maybe.Some(value);
+        var value = Random.Shared.Next();
+        var initial = Maybe.Some(value);
 
-        var result = inital.Bind(v => Maybe.Some(v + 1));
+        var result = initial.Bind(v => Maybe.Some(v + 1));
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(value + 1);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(value + 1);
+        }
     }
 
-    [Fact]
-    public void Maybe_Bind_ShouldReturnNoneWhenInitialIsNone()
+    [Test]
+    public async ValueTask Maybe_Bind_ShouldReturnNoneWhenInitialIsNone()
     {
         Maybe<int> initial = Maybe.None;
 
         var result = initial.Bind(v => Maybe.Some(v + 1));
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Theory]
-    [InlineData(2)]
-    [InlineData(4)]
-    [InlineData(6)]
-    public void Maybe_Filter_ShouldReturnSomeWhenInitialIsSomeAndPredicateIsTrue(int input)
+    [Test]
+    [Arguments(2)]
+    [Arguments(4)]
+    [Arguments(6)]
+    public async ValueTask Maybe_Filter_ShouldReturnSomeWhenInitialIsSomeAndPredicateIsTrue(int input)
     {
         var initial = Maybe.Some(input);
 
         var result = initial.Filter(v => v % 2 == 0);
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(input);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(input);
+        }
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(3)]
-    [InlineData(5)]
-    public void Maybe_Filter_ShouldReturnNoneWhenInitialIsSomeAndPredicateIsFalse(int input)
+    [Test]
+    [Arguments(1)]
+    [Arguments(3)]
+    [Arguments(5)]
+    public async ValueTask Maybe_Filter_ShouldReturnNoneWhenInitialIsSomeAndPredicateIsFalse(int input)
     {
         var initial = Maybe.Some(input);
 
         var result = initial.Filter(v => v % 2 == 0);
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_Filter_ShouldReturnNoneWhenInitialIsNone()
+    [Test]
+    public async ValueTask Maybe_Filter_ShouldReturnNoneWhenInitialIsNone()
     {
         Maybe<string> initial = Maybe.None;
 
         var result = initial.Filter(_ => true);
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_Map_ShouldExecuteMapperWhenInitialIsSome()
+    [Test]
+    public async ValueTask Maybe_Map_ShouldExecuteMapperWhenInitialIsSome()
     {
-        var value = fixture.Create<int>();
-        var inital = Maybe.Some(value);
+        var value = Random.Shared.Next();
+        var initial = Maybe.Some(value);
 
-        var result = inital.Map(v => v + 1);
+        var result = initial.Map(v => v + 1);
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(value + 1);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(value + 1);
+        }
     }
 
-    [Fact]
-    public void Maybe_Map_ShouldReturnNoneWhenInitialIsNone()
+    [Test]
+    public async ValueTask Maybe_Map_ShouldReturnNoneWhenInitialIsNone()
     {
         Maybe<int> initial = Maybe.None;
 
         var result = initial.Map(v => v + 1);
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_And_ShouldReturnOtherWhenInitialIsSome()
+    [Test]
+    public async ValueTask Maybe_And_ShouldReturnOtherWhenInitialIsSome()
     {
         var first = Maybe.Some(1);
         var second = Maybe.Some(2);
 
         var result = first.And(second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(second);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(second);
+        }
     }
 
-    [Fact]
-    public void Maybe_And_ShouldReturnNoneWhenInitialIsNone()
+    [Test]
+    public async ValueTask Maybe_And_ShouldReturnNoneWhenInitialIsNone()
     {
         Maybe<int> first = Maybe.None;
         var second = Maybe.Some(2);
 
         var result = first.And(second);
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_Or_ShouldReturnSelfWhenSome()
+    [Test]
+    public async ValueTask Maybe_Or_ShouldReturnSelfWhenSome()
     {
         var first = Maybe.Some(1);
         var second = Maybe.Some(2);
 
         var result = first.Or(second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(first);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(first);
+        }
     }
 
-    [Fact]
-    public void Maybe_Or_ShouldReturnOtherWhenNone()
+    [Test]
+    public async ValueTask Maybe_Or_ShouldReturnOtherWhenNone()
     {
         Maybe<int> first = Maybe.None;
         var second = Maybe.Some(2);
 
         var result = first.Or(second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(second);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(second);
+        }
     }
 
-    [Fact]
-    public void Maybe_OrElse_ShouldReturnSelfWhenSome()
+    [Test]
+    public async ValueTask Maybe_OrElse_ShouldReturnSelfWhenSome()
     {
         var first = Maybe.Some(1);
         var second = Maybe.Some(2);
 
         var result = first.OrElse(() => second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(first);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(first);
+        }
     }
 
-    [Fact]
-    public void Maybe_OrElse_ShouldExecuteValueFactoryWhenNone()
+    [Test]
+    public async ValueTask Maybe_OrElse_ShouldExecuteValueFactoryWhenNone()
     {
         Maybe<int> first = Maybe.None;
         var second = Maybe.Some(2);
 
         var result = first.OrElse(() => second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(second);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(second);
+        }
     }
 
-    [Fact]
-    public void Maybe_Xor_ShouldReturnSelfWhenSomeAndOtherIsNone()
+    [Test]
+    public async ValueTask Maybe_Xor_ShouldReturnSelfWhenSomeAndOtherIsNone()
     {
         var first = Maybe.Some(1);
         Maybe<int> second = Maybe.None;
 
         var result = first.Xor(second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(first);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(first);
+        }
     }
 
-    [Fact]
-    public void Maybe_Xor_ShouldReturnOtherWhenNoneAndOtherIsSome()
+    [Test]
+    public async ValueTask Maybe_Xor_ShouldReturnOtherWhenNoneAndOtherIsSome()
     {
         Maybe<int> first = Maybe.None;
         var second = Maybe.Some(2);
 
         var result = first.Xor(second);
 
-        result.IsSome.ShouldBeTrue();
-        result.ShouldBe(second);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result).IsEqualTo(second);
+        }
     }
 
-    [Fact]
-    public void Maybe_Xor_ShouldReturnNoneWhenNoneAndOtherIsNone()
+    [Test]
+    public async ValueTask Maybe_Xor_ShouldReturnNoneWhenNoneAndOtherIsNone()
     {
         Maybe<int> first = Maybe.None;
         Maybe<int> second = Maybe.None;
 
         var result = first.Xor(second);
 
-        result.IsNone.ShouldBeTrue();
+        await Assert.That(result.IsNone).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_AsEnumerable_ShouldReturnOneElementForSome()
+    [Test]
+    public async ValueTask Maybe_AsEnumerable_ShouldReturnOneElementForSome()
     {
-        var some = Maybe.Some(fixture.Create<string>());
+        var some = Maybe.Some(Guid.NewGuid().ToString());
 
-        some.AsEnumerable().Count().ShouldBe(1);
+        await Assert.That(some.AsEnumerable().Count()).IsEqualTo(1);
     }
 
-    [Fact]
-    public void Maybe_AsEnumerable_ShouldReturnNoElementsForNone()
+    [Test]
+    public async ValueTask Maybe_AsEnumerable_ShouldReturnNoElementsForNone()
     {
         Maybe<string> none = Maybe.None;
 
-        none.AsEnumerable().Count().ShouldBe(0);
+        await Assert.That(none.AsEnumerable().Count()).IsEqualTo(0);
     }
 
-    [Fact]
-    public void Maybe_BindOrElse_ShouldApplyBinderOnSome()
+    [Test]
+    public async ValueTask Maybe_BindOrElse_ShouldApplyBinderOnSome()
     {
         var some = Maybe.Some(10);
 
         var result = some.BindOrElse(v => Maybe.Some(v + 5), () => Maybe.Some(20));
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(15);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(15);
+        }
     }
 
-    [Fact]
-    public void Maybe_BindOrElse_ShouldUseValueFactoryOnNone()
+    [Test]
+    public async ValueTask Maybe_BindOrElse_ShouldUseValueFactoryOnNone()
     {
         Maybe<int> none = Maybe.None;
 
         var result = none.BindOrElse(_ => Maybe.Some(10), () => Maybe.Some(20));
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(20);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(20);
+        }
     }
 
-    [Fact]
-    public void Maybe_BindOr_ShouldApplyBinderOnSome()
+    [Test]
+    public async ValueTask Maybe_BindOr_ShouldApplyBinderOnSome()
     {
         var some = Maybe.Some(10);
 
         var result = some.BindOr(v => Maybe.Some(v + 5), Maybe.Some(20));
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(15);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(15);
+        }
     }
 
-    [Fact]
-    public void Maybe_BindOr_ShouldUseAlternativeOnNone()
+    [Test]
+    public async ValueTask Maybe_BindOr_ShouldUseAlternativeOnNone()
     {
         Maybe<int> none = Maybe.None;
 
         var result = none.BindOr(_ => Maybe.Some(10), Maybe.Some(20));
 
-        result.IsSome.ShouldBeTrue();
-        result.Unwrap().ShouldBe(20);
+        using (Assert.Multiple())
+        {
+            await Assert.That(result.IsSome).IsTrue();
+            await Assert.That(result.Unwrap()).IsEqualTo(20);
+        }
     }
 
-    [Fact]
-    public void Maybe_Match_ShouldExecuteOnSomeDelegateWhenSome()
+    [Test]
+    public async ValueTask Maybe_Match_ShouldExecuteOnSomeDelegateWhenSome()
     {
         var some = Maybe.Some(10);
 
         var result = some.Match(v => v + 5, () => 100);
 
-        result.ShouldBe(15);
+        await Assert.That(result).IsEqualTo(15);
     }
 
-    [Fact]
-    public void Maybe_Match_ShouldExecuteOnNoneDelegateWhenNone()
+    [Test]
+    public async ValueTask Maybe_Match_ShouldExecuteOnNoneDelegateWhenNone()
     {
         Maybe<int> none = Maybe.None;
 
         var result = none.Match(v => v + 5, () => 100);
 
-        result.ShouldBe(100);
+        await Assert.That(result).IsEqualTo(100);
     }
 
-    [Fact]
-    public void Maybe_Do_ShouldExecuteOnSomeDelegateWhenSome()
+    [Test]
+    public async ValueTask Maybe_Do_ShouldExecuteOnSomeDelegateWhenSome()
     {
         var some = Maybe.Some(10);
         var isSomeExecuted = false;
@@ -487,12 +540,15 @@ public class MaybeTestSuite
 
         some.Do(() => isSomeExecuted = true, () => isNoneExecuted = true);
 
-        isSomeExecuted.ShouldBeTrue();
-        isNoneExecuted.ShouldBeFalse();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isSomeExecuted).IsTrue();
+            await Assert.That(isNoneExecuted).IsFalse();
+        }
     }
 
-    [Fact]
-    public void Maybe_Do_ShouldExecuteOnNoneDelegateWhenNone()
+    [Test]
+    public async ValueTask Maybe_Do_ShouldExecuteOnNoneDelegateWhenNone()
     {
         Maybe<int> none = Maybe.None;
         var isSomeExecuted = false;
@@ -500,51 +556,54 @@ public class MaybeTestSuite
 
         none.Do(() => isSomeExecuted = true, () => isNoneExecuted = true);
 
-        isSomeExecuted.ShouldBeFalse();
-        isNoneExecuted.ShouldBeTrue();
+        using (Assert.Multiple())
+        {
+            await Assert.That(isSomeExecuted).IsFalse();
+            await Assert.That(isNoneExecuted).IsTrue();
+        }
     }
 
-    [Fact]
-    public void Maybe_DoOnSome_ShouldExecuteDelegateWhenSome()
+    [Test]
+    public async ValueTask Maybe_DoOnSome_ShouldExecuteDelegateWhenSome()
     {
         var some = Maybe.Some(10);
         var isExecuted = false;
 
         some.DoOnSome(() => isExecuted = true);
 
-        isExecuted.ShouldBeTrue();
+        await Assert.That(isExecuted).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_DoOnSome_ShouldNotExecuteDelegateWhenNone()
+    [Test]
+    public async ValueTask Maybe_DoOnSome_ShouldNotExecuteDelegateWhenNone()
     {
         Maybe<int> none = Maybe.None;
         var isExecuted = false;
 
         none.DoOnSome(() => isExecuted = true);
 
-        isExecuted.ShouldBeFalse();
+        await Assert.That(isExecuted).IsFalse();
     }
 
-    [Fact]
-    public void Maybe_DoOnNone_ShouldExecuteDelegateWhenNone()
+    [Test]
+    public async ValueTask Maybe_DoOnNone_ShouldExecuteDelegateWhenNone()
     {
         Maybe<int> none = Maybe.None;
         var isExecuted = false;
 
         none.DoOnNone(() => isExecuted = true);
 
-        isExecuted.ShouldBeTrue();
+        await Assert.That(isExecuted).IsTrue();
     }
 
-    [Fact]
-    public void Maybe_DoOnNone_ShouldNotExecuteDelegateWhenSome()
+    [Test]
+    public async ValueTask Maybe_DoOnNone_ShouldNotExecuteDelegateWhenSome()
     {
         var some = Maybe.Some(10);
         var isExecuted = false;
 
         some.DoOnNone(() => isExecuted = true);
 
-        isExecuted.ShouldBeFalse();
+        await Assert.That(isExecuted).IsFalse();
     }
 }
